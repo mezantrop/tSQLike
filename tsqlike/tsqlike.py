@@ -374,6 +374,7 @@ class Table:
         :param indent:      JSON indentation
         :param separators:  JSON separators tuple
         :param sort_keys:   Whether to sort keys or not
+        :param evalctrl:    eval() controlling class
         :return: Nothing
         """
 
@@ -401,9 +402,27 @@ class Table:
             close_file(f)
 
     # -------------------------------------------------------------------------------------------- #
-    def write_json_lt(self):
-        """ Not implemented """
-        # TODO: Implement me
+    def write_json_lt(self, out_file=None, indent=None, separators=None, sort_keys=False):
+        """
+        Lite, no eval() version of write_json() method
+
+        :param out_file:    Filename to write CSV data or None for stdout
+        :param indent:      JSON indentation
+        :param separators:  JSON separators tuple
+        :param sort_keys:   Whether to sort keys or not
+        :return: Nothing
+        """
+
+        f = open_file(out_file, 'w')
+        try:
+            f.write(json.dumps(self.export_list_dicts(), indent=indent,
+                               separators=separators, sort_keys=sort_keys))
+        except (IOError, OSError) as _err:
+            print(f'FATAL@Table.write_json(): {_err}')
+            sys.exit(1)
+
+        close_file(f)
+        return self
 
     # -------------------------------------------------------------------------------------------- #
     def write_xml(self):

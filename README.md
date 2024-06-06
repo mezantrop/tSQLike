@@ -1,22 +1,22 @@
 # tSQLike
 ## SQL-like interface to tabular structured data
 
-**Still in development: beware of bugs, every API entry is a subject to change**
+**Not that early stage, but still in development: may contain bugs**
 
 ## Description
 
-tSQLike is a Python3 module that is written with a hope to make tabular data process easier using SQL-like primitives. 
+**tSQLike** is a Python3 module that is written with a hope to make tabular data process easier using SQL-like primitives. 
 
 ## Usage
 
-```Python
+```Python3
 from tsqlike import tsqlike
 
 t1 = tsqlike.Table(data=[['h1', 'h2', 'h3', 'h4'],
                         ['a', 'b', 'c', 'd'],
                         ['b', 'c', 'd', 'd'],
                         ['f', 'g', 'h', 'i']],
-                  name='first')
+                   name='first')
 t2 = tsqlike.Table().import_list_dicts(data=[{'h1': 1, 'h2': 2, 'h3': 3},
                                             {'h1': 'd', 'h2': 'e', 'h3': 'f'}],
                                        name='second')
@@ -69,7 +69,7 @@ The main class of the module
 |-----------------|---------|---------------------------------------------------------------------|
 | `write_csv`     | &#9745; | Make `CSV` from the `Table` object and write it to a file or stdout |
 | `write_json`    | &#9745; | Write `JSON` into file or `STDOUT` [*](#Warning)                    |
-| `write_json_lt` | &#9744; | `eval()`-free version of `Table.write_json`                         |
+| `write_json_lt` | &#9745; | `eval()`-free version of `Table.write_json`                         |
 | `write_xml`     | &#9744; | Write `XML`. NB: Do we need this?                                   |
 
 #### Private methods
