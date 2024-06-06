@@ -69,7 +69,7 @@ The main class of the module
 |-----------------|---------|---------------------------------------------------------------------|
 | `write_csv`     | &#9745; | Make `CSV` from the `Table` object and write it to a file or stdout |
 | `write_json`    | &#9745; | Write `JSON` into file or `STDOUT` [*](#Warning)                    |
-| `write_json_lr` | &#9744; | `eval()`-free version of `Table.write_json`                         |
+| `write_json_lt` | &#9744; | `eval()`-free version of `Table.write_json`                         |
 | `write_xml`     | &#9744; | Write `XML`. NB: Do we need this?                                   |
 
 #### Private methods

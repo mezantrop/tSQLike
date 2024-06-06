@@ -22,8 +22,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mezantrop/SQLike"
-Issues = "https://github.com/mezantrop/SQLike/issues"
+Homepage = "https://github.com/mezantrop/tSQLike"
+Issues = "https://github.com/mezantrop/tSQLike/issues"
 
 [build-system]
 requires = ["hatchling"]
