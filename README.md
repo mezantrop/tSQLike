@@ -1,4 +1,6 @@
 # tSQLike
+[![Python package](https://github.com/mezantrop/tSQLike/actions/workflows/python-package.yml/badge.svg)](https://github.com/mezantrop/tSQLike/actions/workflows/python-package.yml)
+[![CodeQL](https://github.com/mezantrop/tSQLike/actions/workflows/codeql.yml/badge.svg)](https://github.com/mezantrop/tSQLike/actions/workflows/codeql.yml)
 ## SQL-like interface to tabular structured data
 
 **Not that early stage, but still in development: may contain bugs**
