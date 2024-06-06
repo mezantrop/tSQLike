@@ -3,6 +3,8 @@
 
 **Not that early stage, but still in development: may contain bugs**
 
+<a href="https://www.buymeacoffee.com/mezantrop" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## Description
 
 **tSQLike** is a Python3 module that is written with a hope to make tabular data process easier using SQL-like primitives. 
