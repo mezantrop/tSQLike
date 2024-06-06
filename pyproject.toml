@@ -1,5 +1,5 @@
 [project]
-name = "SQLike"
+name = "tSQLike"
 dynamic = [
  "version",
 ]
@@ -30,4 +30,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "sqlike/__about__.py"
+path = "tsqlike/__about__.py"
