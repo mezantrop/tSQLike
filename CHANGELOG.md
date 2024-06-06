@@ -1,4 +1,5 @@
 # CHANGELOG
+
 * **2024.06.06    Current** 
   * `write_json_lt()` added
   * `README.md` updated

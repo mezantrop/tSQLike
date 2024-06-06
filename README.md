@@ -28,6 +28,12 @@ t3.write_csv(dialect='unix')
 "a", "b", "c", "d", "d", "e", "f"
 ```
 
+## Installation
+
+```
+pip install tsqlike
+```
+
 ## Functionality
 
 ### Table class
@@ -93,7 +99,6 @@ Controls what arguments are available to `eval()` function
 | `open_file`  | &#9745; | Open a file  |
 | `close_file` | &#9745; | Close a file |
 
-
 #### WARNING!
 Methods `Table.join(on=)`, `Table.select(where=)` and `Table.write_json(export_f=)`, use `eval()` function 
 to run specified expressions within the program. **ANY** expression, including one that is potentially **DANGEROUS** 
@@ -102,12 +107,6 @@ and safety of these arguments and `EvalCtrl` helps to block potentially dangerou
 
 Alternatively you can use `Table.join_lt()`, `Table.select_lt()` and `Table.write_json()`. They are significantly less
 powerful, but do not use `eval()`.
-
-## Installation
-
-```
-pip install tsqlike
-```
 
 ## Contacts
 If you have an idea, a question, or have found a problem, do not hesitate to open an issue or mail me directly: 
