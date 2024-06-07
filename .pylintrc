@@ -4,7 +4,6 @@
         eval-used,
         fixme,
         no-member,
-        pointless-string-statement,
         too-many-arguments,
         too-many-boolean-expressions,
         too-many-branches,
