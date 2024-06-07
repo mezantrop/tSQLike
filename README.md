@@ -60,13 +60,6 @@ The main class of the module
 | `import_list_dicts` | &#9745; | Import a list of horizontal arranged dictionaries into the `Table`      |
 | `import_list_lists` | &#9745; | Import `list(list_1(), list_n())` with optional first row as the header |
 
-#### Read methods
-| Name        | Status  | Description                             |
-|-------------|---------|-----------------------------------------|
-| `read_json` | &#9744; | Read `JSON` structure                   |
-| `read_csv`  | &#9745; | Read `CSV` file                         |
-| `read_xml`  | &#9744; | Read `XML`. NB: Do we need XML support? |
-
 #### Export methods
 | Name                | Status  | Description                                                             |
 |---------------------|---------|-------------------------------------------------------------------------|
@@ -98,10 +91,13 @@ Controls what arguments are available to `eval()` function
 | `blacklist_remove` | &#9745; | Remove the word from the blacklist                       |
 
 ### Standalone functions
-| Name         | Status  | Description  |
-|--------------|---------|--------------|
-| `open_file`  | &#9745; | Open a file  |
-| `close_file` | &#9745; | Close a file |
+| Name         | Status  | Description                               |
+|--------------|---------|-------------------------------------------|
+| `open_file`  | &#9745; | Open a file                               |
+| `close_file` | &#9745; | Close a file                              |
+| `read_json`  | &#9745; | Read `JSON` file                          |
+| `read_csv`   | &#9745; | Read `CSV` file                           |
+| `read_xml`   | &#9744; | Read `XML`. NB: Do we need XML support?   |
 
 #### WARNING!
 Methods `Table.join(on=)`, `Table.select(where=)` and `Table.write_json(export_f=)`, use `eval()` function 

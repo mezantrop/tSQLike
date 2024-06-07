@@ -94,6 +94,50 @@ def close_file(file):
 
 
 # ------------------------------------------------------------------------------------------------ #
+def read_csv(in_file=None, encoding=None, newline='', name='', dialect='excel', **fmtparams):
+    """
+    Read CSV from a file and import into a Table object
+
+    :param in_file:         Filename to read CSV from
+    :param encoding:        Character encoding
+    :param newline:         UNIX/Windows/Mac style line ending
+    :param name:            Table name to assign
+    :param dialect:         CSV dialect, e.g: excel, unix
+    :**fmtparams:           Various optional CSV parameters:
+        :param delimiter:   CSV field delimiter
+        :param quotechar:   CSV quote character
+        :param quoting:     CSV quote style
+    :return: Table
+    """
+
+    f = open_file(in_file, file_mode='r', encoding=encoding, newline=newline)
+    _data = csv.reader(f, dialect=dialect, **fmtparams)
+    t = Table(data=list(_data), name=name)
+    close_file(f)
+    return t
+
+
+# -------------------------------------------------------------------------------------------- #
+def read_json(in_file=None, name=''):
+    """ Read JSON data from file
+
+    :param in_file: Filename to read JSON from
+    :param name:    Table name to assign
+    :return         Table
+    """
+
+    _data = {}
+    f = open_file(file_name=in_file, file_mode='r')
+    try:
+        _data = json.load(f)
+    except (IOError, OSError) as _err:
+        print(f'FATAL@Table.read_json(): Unable to load JSON structure: {_err}')
+    t = Table(data=_data, name=name)
+    close_file(f)
+    return t
+
+
+# ------------------------------------------------------------------------------------------------ #
 class EvalCtrl:
 
     """
@@ -167,12 +211,13 @@ class Table:
             self.rows = 0
             self.cols = 0
         elif isinstance(data, list) and len(data):
-            if isinstance(data[0], dict):               # list(dicts())
+            if isinstance(data[0], dict):                   # list(dicts())
                 self.import_list_dicts(data)
-            if isinstance(data[0], list):               # list(lists())
+            if isinstance(data[0], list):                   # list(lists())
                 self.import_list_lists(data)
         elif isinstance(data, dict) and len(data):
-            if isinstance(next(iter(data)), list):      # dict(lists()):
+            print(type(next(iter(data))))
+            if isinstance(data[next(iter(data))], list):    # dict(lists()):
                 self.import_dict_lists(data)
         else:
             raise ValueError('FATAL@Table.__init__: Unexpected data format')
@@ -285,35 +330,6 @@ class Table:
 
         self.timestamp = int(time.time())
         return self
-
-    # -------------------------------------------------------------------------------------------- #
-    def read_csv(self, in_file=None, encoding=None, newline='',
-                 new_tname='', dialect='excel', **fmtparams):
-        """
-        Read CSV from a file and import into a Table object
-
-        :param in_file:         Filename to write CSV data or None for stdout
-        :param encoding:        Character encoding
-        :param newline:         UNIX/Windows/Mac style line ending
-        :param new_tname:       Rename the Table object if needed
-        :param dialect:         CSV dialect, e.g: excel, unix
-        :**fmtparams:           Various optional CSV parameters:
-            :param delimiter:   CSV field delimiter
-            :param quotechar:   CSV quote character
-            :param quoting:     CSV quote style
-        :return: Table
-        """
-
-        f = open_file(in_file, 'r', encoding=encoding, newline=newline)
-        csvr = csv.reader(f, dialect=dialect, **fmtparams)
-        self.import_list_lists(list(csvr), name=new_tname)
-        close_file(f)
-        return self
-
-    # -------------------------------------------------------------------------------------------- #
-    def read_json(self):
-        """ Not implemented yet """
-        # TODO: Implement me
 
     # -- Export data ----------------------------------------------------------------------------- #
     def export_list_dicts(self):
