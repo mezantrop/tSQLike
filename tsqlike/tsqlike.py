@@ -394,6 +394,10 @@ class Table:
         :return: Nothing
         """
 
+        """
+        Usage example: t.write_json(out_file='1.json', export_f='export_dict_lists()')
+        """
+
         if export_f:
             bl = evalctrl.blacklisted(export_f)
             if bl[0]:
