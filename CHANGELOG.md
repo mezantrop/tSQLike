@@ -1,12 +1,11 @@
 # CHANGELOG
 
-* **2024.06.07    Current** 
+* **2024.06.15    Current**
+  * `write_json()` defaults to `export_f='export_list_dicts()'`
   * `read_json()` implemented as a standalone function
   * `read_csv()` became standalone
-  *  `Table` auto-import on init of `dict(lists)` fixed
+  * `Table` auto-import on init of `dict(lists)` fixed
   * `README.md` updated
-
-* **2024.06.06    Current** 
   * `write_json_lt()` added
   * `README.md` updated
 

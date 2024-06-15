@@ -380,8 +380,8 @@ class Table:
         close_file(f)
 
     # -------------------------------------------------------------------------------------------- #
-    def write_json(self, out_file=None, export_f='', indent=None, separators=None, sort_keys=False,
-                   evalctrl=EvalCtrl()):
+    def write_json(self, out_file=None, export_f='export_list_dicts()',
+                   indent=None, separators=None, sort_keys=False, evalctrl=EvalCtrl()):
         """
         Make JSON from the Table object and write it to a file or stdout
 
