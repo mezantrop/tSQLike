@@ -1,6 +1,6 @@
 # CHANGELOG
 
-* **2024.06.28    tSQLike-1.0.3**
+* **2024.06.28    tSQLike-1.0.4**
   * `select_lt()` respects empty arguments
 
 * **2024.06.24    tSQLike-1.0.3**
