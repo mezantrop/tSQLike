@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.06.28    tSQLike-1.0.3**
+  * `select_lt()` respects empty arguments
+
 * **2024.06.24    tSQLike-1.0.3**
   * `write_json()` defaults to `export_f='export_list_dicts()'`
   * `read_json()` implemented as a standalone function

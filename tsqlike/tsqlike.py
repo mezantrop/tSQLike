@@ -621,14 +621,19 @@ class Table:
 
         r_table = [[]]
         r_columns = []
-        columns = self.header if columns == '*' else columns.split(',')
-        scol_idx = self.header.index(where)
+        columns = self.header if columns in ('*', '') else columns.split(',')
 
         for column in self.header:
             if column in columns:
                 r_table[0].append(column)
                 r_columns.append(self.header.index(column))
 
+        if not where or not comp or not val:
+            return Table(name=new_tname if new_tname else
+                         self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
+                         data=r_table + [[r[c] for c in r_columns] for r in self.table])
+
+        scol_idx = self.header.index(where)
         return Table(name=new_tname if new_tname else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=r_table + [[r[c] for c in r_columns]
