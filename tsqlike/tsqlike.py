@@ -277,7 +277,8 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
-            self.table = [list(r.values()) for r in data] if not detect_types else [[to_type(v) for v in r.values()] for r in data]
+            self.table = [list(r.values()) for r in data] if not detect_types else [
+                [to_type(v) for v in r.values()] for r in data]
 
         else:
             raise ValueError('FATAL@Table.import_list_dicts: Unexpected data format')
