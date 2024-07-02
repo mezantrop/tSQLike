@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.07.02    tSQLike-1.1.0**
+  * Import methods use `detect_types` to detect if autoconversion from `str` to `int`, `float` and `bool` is needed
+
 * **2024.06.28    tSQLike-1.0.4**
   * `select_lt()` respects empty arguments
 

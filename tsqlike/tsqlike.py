@@ -92,9 +92,21 @@ def close_file(file):
     if file and file is not sys.stdout and file is not sys.stdin:
         file.close()
 
+# ------------------------------------------------------------------------------------------------ #
+def to_type(s):
+    """ Convert string s to a proper type: int, float or boolean """
+
+    if s in ('True', 'true', 'False', 'false'):                 # to boolean
+        return bool(s)
+
+    try:
+        return float(s) if '.' in s or ',' in s else int(s)     # to float and int
+    except (ValueError, TypeError):
+        return s                                                # no conversion possible -> string
 
 # ------------------------------------------------------------------------------------------------ #
-def read_csv(in_file=None, encoding=None, newline='', name='', dialect='excel', **fmtparams):
+def read_csv(in_file=None, encoding=None, newline='', name='', detect_types=False,
+             dialect='excel', **fmtparams):
     """
     Read CSV from a file and import into a Table object
 
@@ -102,6 +114,7 @@ def read_csv(in_file=None, encoding=None, newline='', name='', dialect='excel', 
     :param encoding:        Character encoding
     :param newline:         UNIX/Windows/Mac style line ending
     :param name:            Table name to assign
+    :param detect_types:    Detect and correct types of data, default - False
     :param dialect:         CSV dialect, e.g: excel, unix
     :**fmtparams:           Various optional CSV parameters:
         :param delimiter:   CSV field delimiter
@@ -112,18 +125,19 @@ def read_csv(in_file=None, encoding=None, newline='', name='', dialect='excel', 
 
     f = open_file(in_file, file_mode='r', encoding=encoding, newline=newline)
     _data = csv.reader(f, dialect=dialect, **fmtparams)
-    t = Table(data=list(_data), name=name)
+    t = Table(data=list(_data), name=name, detect_types=detect_types)
     close_file(f)
     return t
 
 
 # -------------------------------------------------------------------------------------------- #
-def read_json(in_file=None, name=''):
+def read_json(in_file=None, name='', detect_types=False):
     """ Read JSON data from file
 
-    :param in_file: Filename to read JSON from
-    :param name:    Table name to assign
-    :return         Table
+    :param in_file:         Filename to read JSON from
+    :param name:            Table name to assign
+    :param detect_types:    Detect and correct types of data, default - False
+    :return                 Table
     """
 
     _data = {}
@@ -132,7 +146,7 @@ def read_json(in_file=None, name=''):
         _data = json.load(f)
     except (IOError, OSError) as _err:
         print(f'FATAL@Table.read_json(): Unable to load JSON structure: {_err}')
-    t = Table(data=_data, name=name)
+    t = Table(data=_data, name=name, detect_types=detect_types)
     close_file(f)
     return t
 
@@ -201,7 +215,7 @@ class Table:
     """
 
     # -------------------------------------------------------------------------------------------- #
-    def __init__(self, data=None, name=None):
+    def __init__(self, data=None, name=None, detect_types=False):
         self.timestamp = int(time.time())
         self.name = name or str(self.timestamp)
 
@@ -212,13 +226,13 @@ class Table:
             self.cols = 0
         elif isinstance(data, list) and len(data):
             if isinstance(data[0], dict):                   # list(dicts())
-                self.import_list_dicts(data)
+                self.import_list_dicts(data, detect_types=detect_types)
             if isinstance(data[0], list):                   # list(lists())
-                self.import_list_lists(data)
+                self.import_list_lists(data, detect_types=detect_types)
         elif isinstance(data, dict) and len(data):
             print(type(next(iter(data))))
             if isinstance(data[next(iter(data))], list):    # dict(lists()):
-                self.import_dict_lists(data)
+                self.import_dict_lists(data, detect_types=detect_types)
         else:
             raise ValueError('FATAL@Table.__init__: Unexpected data format')
 
@@ -244,14 +258,15 @@ class Table:
         self.cols = self.rows and len(self.table[0]) or 0
 
     # -- Import methods -------------------------------------------------------------------------- #
-    def import_list_dicts(self, data, name=None):
+    def import_list_dicts(self, data, name=None, detect_types=False):
         """
         Import a list of dictionaries
 
-        :alias:         import_thashes()
-        :param data:    Data to import formatted as list of dictionaries
-        :param name:    If not None, set it as the Table name
-        :return:        self
+        :alias:                 import_thashes()
+        :param data:            Data to import formatted as list of dictionaries
+        :param name:            If not None, set it as the Table name
+        :param detect_types:    Detect and correct types of data, default - False
+        :return:                self
         """
 
         # Set a new Table name if requested
@@ -262,7 +277,8 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
-            self.table = [list(r.values()) for r in data]
+            self.table = [list(r.values()) for r in data] if not detect_types else [[to_type(v) for v in r.values()] for r in data]
+
         else:
             raise ValueError('FATAL@Table.import_list_dicts: Unexpected data format')
 
@@ -272,7 +288,7 @@ class Table:
         return self
 
     # -------------------------------------------------------------------------------------------- #
-    def import_dict_lists(self, data, name=None):
+    def import_dict_lists(self, data, name=None, detect_types=False):
         """
         Import a dictionary of lists
         """
@@ -290,7 +306,7 @@ class Table:
 
             for c, f in enumerate(data.keys()):
                 for r, v in enumerate(data[f]):
-                    self.table[r][c] = v
+                    self.table[r][c] = v if not detect_types else to_type(v)
             self._redimension()
         else:
             raise ValueError('FATAL@Table.import_dict_lists: Unexpected data format')
@@ -299,14 +315,15 @@ class Table:
         return self
 
     # -------------------------------------------------------------------------------------------- #
-    def import_list_lists(self, data, header=True, name=None):
+    def import_list_lists(self, data, header=True, name=None, detect_types=False):
         """
         Import list(list_1(), list_n()) with optional first row as the header
 
-        :param data:    Data to import formatted as list of lists
-        :param header:  If true, data to import HAS a header
-        :param name:    If not None, set it as the Table name
-        :return:        self
+        :param data:            Data to import formatted as list of lists
+        :param header:          If true, data to import HAS a header
+        :param name:            If not None, set it as the Table name
+        :param detect_types:    Detect and correct types of data, default - False
+        :return:                self
         """
 
         # Set a new Table name if requested
@@ -315,7 +332,11 @@ class Table:
 
         if isinstance(data, list) and len(data) and isinstance(data[0], list):
             # TODO: Check all rows to be equal length
-            self.table = data[1:] if header else data
+            if not detect_types:
+                self.table = data[1:] if header else data
+            else:
+                self.table = [[to_type(v) for v in r] for r in data[1:]]
+
             self._redimension()
 
             # If table header is not properly initiated, make each column: "name.column"
@@ -634,17 +655,18 @@ class Table:
                          data=r_table + [[r[c] for c in r_columns] for r in self.table])
 
         scol_idx = self.header.index(where)
+        _type = type(val)
         return Table(name=new_tname if new_tname else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=r_table + [[r[c] for c in r_columns]
                                      for r in self.table
-                                     if comp == '==' and r[scol_idx] == val or
-                                     comp == '!=' and r[scol_idx] != val or
-                                     comp == '>' and r[scol_idx] > val or
-                                     comp == '>=' and r[scol_idx] >= val or
-                                     comp == '<=' and r[scol_idx] <= val or
-                                     comp == 'in' and r[scol_idx] in val or
-                                     comp == 'not in' and r[scol_idx] not in val])
+                                     if comp == '==' and _type(r[scol_idx]) == val or
+                                     comp == '!=' and _type(r[scol_idx]) != val or
+                                     comp == '>' and _type(r[scol_idx]) > val or
+                                     comp == '>=' and _type(r[scol_idx]) >= val or
+                                     comp == '<=' and _type(r[scol_idx]) <= val or
+                                     comp == 'in' and _type(r[scol_idx]) in val or
+                                     comp == 'not in' and _type(r[scol_idx]) not in val])
 
     # -------------------------------------------------------------------------------------------- #
     def order_by(self, column='', direction=ORDER_BY_INC, new_tname=''):
