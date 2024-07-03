@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.07.03    tSQLike-1.1.1**
+  * `select_lt()` to accept `<` comparison operator
+
 * **2024.07.02    tSQLike-1.1.0**
   * Import methods use `detect_types` to detect if auto-conversion from `str` to `int`, `float` and `bool` is needed
 

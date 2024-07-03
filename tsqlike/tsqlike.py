@@ -664,6 +664,7 @@ class Table:
                                      if comp == '==' and _type(r[scol_idx]) == val or
                                      comp == '!=' and _type(r[scol_idx]) != val or
                                      comp == '>' and _type(r[scol_idx]) > val or
+                                     comp == '<' and _type(r[scol_idx]) < val or
                                      comp == '>=' and _type(r[scol_idx]) >= val or
                                      comp == '<=' and _type(r[scol_idx]) <= val or
                                      comp == 'in' and _type(r[scol_idx]) in val or
