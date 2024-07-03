@@ -92,8 +92,9 @@ def close_file(file):
     if file and file is not sys.stdout and file is not sys.stdin:
         file.close()
 
+
 # ------------------------------------------------------------------------------------------------ #
-def to_type(s):
+def str_to_type(s):
     """ Convert string s to a proper type: int, float or boolean """
 
     if s in ('True', 'true', 'False', 'false'):                 # to boolean
@@ -103,6 +104,7 @@ def to_type(s):
         return float(s) if '.' in s or ',' in s else int(s)     # to float and int
     except (ValueError, TypeError):
         return s                                                # no conversion possible -> string
+
 
 # ------------------------------------------------------------------------------------------------ #
 def read_csv(in_file=None, encoding=None, newline='', name='', detect_types=False,
@@ -278,7 +280,7 @@ class Table:
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
             self.table = [list(r.values()) for r in data] if not detect_types else [
-                [to_type(v) for v in r.values()] for r in data]
+                [str_to_type(v) for v in r.values()] for r in data]
 
         else:
             raise ValueError('FATAL@Table.import_list_dicts: Unexpected data format')
@@ -307,7 +309,7 @@ class Table:
 
             for c, f in enumerate(data.keys()):
                 for r, v in enumerate(data[f]):
-                    self.table[r][c] = v if not detect_types else to_type(v)
+                    self.table[r][c] = v if not detect_types else str_to_type(v)
             self._redimension()
         else:
             raise ValueError('FATAL@Table.import_dict_lists: Unexpected data format')
@@ -336,7 +338,7 @@ class Table:
             if not detect_types:
                 self.table = data[1:] if header else data
             else:
-                self.table = [[to_type(v) for v in r] for r in data[1:]]
+                self.table = [[str_to_type(v) for v in r] for r in data[1:]]
 
             self._redimension()
 

@@ -100,14 +100,14 @@ Controls what arguments are available to `eval()` function
 
 ### Standalone functions
 
-| Name         | Status  | Description                                                |
-|--------------|---------|------------------------------------------------------------|
-| `open_file`  | &#9745; | Open a file                                                |
-| `close_file` | &#9745; | Close a file                                               |
-| `read_json`  | &#9745; | Read `JSON` file                                           |
-| `read_csv`   | &#9745; | Read `CSV` file                                            |
-| `read_xml`   | &#9744; | Read `XML`. NB: Do we need XML support?                    |
-| `to_type`    | &#9745; | Convert a `str` to a proper type: `int`, `float` or `bool` |
+| Name          | Status  | Description                                                |
+|---------------|---------|------------------------------------------------------------|
+| `open_file`   | &#9745; | Open a file                                                |
+| `close_file`  | &#9745; | Close a file                                               |
+| `read_json`   | &#9745; | Read `JSON` file                                           |
+| `read_csv`    | &#9745; | Read `CSV` file                                            |
+| `read_xml`    | &#9744; | Read `XML`. NB: Do we need XML support?                    |
+| `str_to_type` | &#9745; | Convert a `str` to a proper type: `int`, `float` or `bool` |
 
 #### WARNING
 
