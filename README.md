@@ -5,7 +5,10 @@
 
 ## SQL-like interface to tabular structured data
 
-**Not that early stage, but still in development: may contain bugs**
+### Notes
+    * Not that early stage, but still in development: may contain bugs
+    * Dont expect performance from this library
+
 
 <a href="https://www.buymeacoffee.com/mezantrop" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 

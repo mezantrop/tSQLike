@@ -536,14 +536,14 @@ class Table:
                      else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table)
 
     # -------------------------------------------------------------------------------------------- #
-    def join_lt(self, table, scol, tcol, comp='==', mode=JOIN_INNER, new_tname='', replace=False):
+    def join_lt(self, table, scol, tcol, mode=JOIN_INNER, new_tname='', replace=False):
+
         """
         Light, limited and safe Join, that doesn't use eval()
 
         :param table:       Table to join self with
         :param scol:        Self column to join on
         :param tcol:        Table column to join on
-        :param comp:        Comparison or membership operator
         :param mode:        Join mode
         :param new_tname:   Give a name of the returned Table
         :param replace:     Replace source with the new data or not
@@ -552,36 +552,34 @@ class Table:
 
         lci = self.header.index(scol) if scol in self.header else None
         rci = table.header.index(tcol) if tcol in table.header else None
-        r_table = []
+        r_table = {}
         tl_match = []
         tr_match = []
 
         # Concatenate table headers as row[0] of the results table
-        r_table.append(self.header + table.header)
+        r_table[0] = self.header + table.header
 
+        rtc = 0
         if None not in (lci, rci):
             # Inner JOIN
-            for c_tl, tl in enumerate(self.table):
-                for c_tr, tr in enumerate(table.table):
-                    if (comp == '==' and tl[lci] == tr[rci] or
-                            comp == '!=' and tl[lci] != tr[rci] or
-                            comp == '>' and tl[lci] > tr[rci] or
-                            comp == '<' and tl[lci] < tr[rci] or
-                            comp == '>=' and tl[lci] >= tr[rci] or
-                            comp == '<=' and tl[lci] <= tr[rci] or
-                            comp == 'in' and tl[lci] in tr[rci] or
-                            comp == 'not in' and tl[lci] not in tr[rci]):
-                        r_table.append(tl + tr)
-                        tl_match.append(c_tl)
-                        tr_match.append(c_tr)
+            for tl in range(self.rows):
+                for tr in range(table.rows):
+                    if self.table[tl][lci] == table.table[tr][rci]:
+                        rtc += 1
+                        r_table[rtc] = [*self.table[tl], *table.table[tr]]
+                        if mode in (JOIN_LEFT, JOIN_FULL):
+                            tl_match.append([*self.table[tl]])
+                            tr_match.append([*table.table[tr]])
         if mode in (JOIN_LEFT, JOIN_FULL):
-            for it in range(0, self.rows):
+            for it in range(self.rows):
                 if it not in tl_match:
                     r_table.append([self.table[it] + [None] * table.cols])
         if mode in (JOIN_RIGHT, JOIN_FULL):
-            for it in range(0, table.rows):
+            for it in range(table.rows):
                 if it not in tr_match:
                     r_table.append([[None] * self.cols + table.table[it]])
+
+        r_table = list(r_table.keys())
 
         if replace:
             # Replace source - self - with the joined Table
