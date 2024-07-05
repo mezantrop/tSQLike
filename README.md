@@ -6,8 +6,8 @@
 ## SQL-like interface to tabular structured data
 
 ### Notes
-    * Not that early stage, but still in development: may contain bugs
-    * Dont expect performance from this library
+  * Not that early stage, but still in development: may contain bugs
+  * Do not expect performance from this library
 
 
 <a href="https://www.buymeacoffee.com/mezantrop" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
