@@ -552,9 +552,6 @@ class Table:
         lci = self.header.index(scol) if scol in self.header else None
         rci = table.header.index(tcol) if tcol in table.header else None
         r_table = []
-        tl_match = []
-        tr_match = []
-
         l_dict = {}
         r_dict = {}
 
