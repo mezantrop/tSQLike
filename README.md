@@ -5,16 +5,16 @@
 
 ## SQL-like interface to tabular structured data
 
-### Notes
-  * Not that early stage, but still in development: may contain bugs
-  * Do not expect performance from this library
-
-
 <a href="https://www.buymeacoffee.com/mezantrop" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 
 ## Description
 
 **tSQLike** is a `Python3` module that is written with a hope to make tabular data process easier using SQL-like primitives.
+
+## Notes
+
+**Not that early stage, but still in development: may contain bugs**
 
 ## Usage
 
@@ -51,14 +51,14 @@ The main class of the module
 
 #### Data processing methods
 
-| Name        | Status  | Description                                                              |
-|-------------|---------|--------------------------------------------------------------------------|
-| `join`      | &#9745; | Join two Tables (`self` and `table`) on an expression [*](#Warning)      |
-| `join_lt`   | &#9745; | Light, limited and safe Join, that doesn't use `eval()`                  |
-| `select`    | &#9745; | Select column(s) from the `Table` [*](#Warning)                          |
-| `select_lt` | &#9745; | `eval()`-free version of select                                          |
-| `order_by`  | &#9745; | ORDER BY primitive of SQL SELECT to sort the Table by a column           |
-| `group_by`  | &#9745; | GROUP BY primitive of SQL SELECT to apply aggregate function on a column |
+| Name        | Status  | Description                                                                                |
+|-------------|---------|--------------------------------------------------------------------------------------------|
+| `join`      | &#9745; | Join two Tables (`self` and `table`) on an expression [*](#Warning). Complex, but **slow** |
+| `join_lt`   | &#9745; | Light, limited, **fast** and safe `Join`, that doesn't use `eval()`                        |
+| `select`    | &#9745; | Select column(s) from the `Table` [*](#Warning)                                            |
+| `select_lt` | &#9745; | `eval()`-free version of select                                                            |
+| `order_by`  | &#9745; | ORDER BY primitive of SQL SELECT to sort the Table by a column                             |
+| `group_by`  | &#9745; | GROUP BY primitive of SQL SELECT to apply aggregate function on a column                   |
 
 #### Import methods
 
