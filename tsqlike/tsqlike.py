@@ -540,7 +540,6 @@ class Table:
 
         """
         Light, limited and safe Join, that doesn't use eval()
-
         :param table:       Table to join self with
         :param scol:        Self column to join on
         :param tcol:        Table column to join on
@@ -552,21 +551,19 @@ class Table:
 
         lci = self.header.index(scol) if scol in self.header else None
         rci = table.header.index(tcol) if tcol in table.header else None
-        r_table = {}
+        r_table = []
         tl_match = []
         tr_match = []
 
         # Concatenate table headers as row[0] of the results table
-        r_table[0] = self.header + table.header
+        r_table.append(self.header + table.header)
 
-        rtc = 0
         if None not in (lci, rci):
             # Inner JOIN
             for tl in range(self.rows):
                 for tr in range(table.rows):
                     if self.table[tl][lci] == table.table[tr][rci]:
-                        rtc += 1
-                        r_table[rtc] = [*self.table[tl], *table.table[tr]]
+                        r_table.append([*self.table[tl], *table.table[tr]])
                         if mode in (JOIN_LEFT, JOIN_FULL):
                             tl_match.append([*self.table[tl]])
                             tr_match.append([*table.table[tr]])
@@ -578,8 +575,6 @@ class Table:
             for it in range(table.rows):
                 if it not in tr_match:
                     r_table.append([[None] * self.cols + table.table[it]])
-
-        r_table = list(r_table.keys())
 
         if replace:
             # Replace source - self - with the joined Table
