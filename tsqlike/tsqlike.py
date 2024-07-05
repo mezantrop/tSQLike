@@ -555,26 +555,44 @@ class Table:
         tl_match = []
         tr_match = []
 
+        l_dict = {}
+        r_dict = {}
+
         # Concatenate table headers as row[0] of the results table
         r_table.append(self.header + table.header)
 
         if None not in (lci, rci):
             # Inner JOIN
             for tl in range(self.rows):
-                for tr in range(table.rows):
-                    if self.table[tl][lci] == table.table[tr][rci]:
-                        r_table.append([*self.table[tl], *table.table[tr]])
-                        if mode in (JOIN_LEFT, JOIN_FULL):
-                            tl_match.append([*self.table[tl]])
-                            tr_match.append([*table.table[tr]])
-        if mode in (JOIN_LEFT, JOIN_FULL):
-            for it in range(self.rows):
-                if it not in tl_match:
-                    r_table.append([self.table[it] + [None] * table.cols])
-        if mode in (JOIN_RIGHT, JOIN_FULL):
-            for it in range(table.rows):
-                if it not in tr_match:
-                    r_table.append([[None] * self.cols + table.table[it]])
+                if not l_dict.get(self.table[tl][lci]):
+                    l_dict[self.table[tl][lci]] = [self.table[tl]]
+                else:
+                    l_dict[self.table[tl][lci]].append(self.table[tl])
+
+            for tr in range(table.rows):
+                if not r_dict.get(table.table[tr][rci]):
+                    r_dict[table.table[tr][rci]] = [table.table[tr]]
+                else:
+                    r_dict[table.table[tr][rci]].append(table.table[tr])
+
+            ldk = l_dict.keys()
+            rdk = r_dict.keys()
+            for lk in ldk:
+                for rk in rdk:
+                    if lk == rk:
+                        for lv in l_dict[lk]:
+                            for rv in r_dict[rk]:
+                                r_table.append(lv + rv)
+                        continue
+                    if mode in (JOIN_RIGHT, JOIN_FULL):
+                        if rk not in ldk:
+                            for rv in r_dict[rk]:
+                                r_table.append([None] * self.cols + rv)
+                        continue
+                if mode in (JOIN_LEFT, JOIN_FULL):
+                    if lk not in rdk:
+                        for lv in l_dict[lk]:
+                            r_table.append(lv + [None] * table.cols)
 
         if replace:
             # Replace source - self - with the joined Table
