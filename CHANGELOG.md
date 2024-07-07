@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.07.07    tSQLike-1.1.2**
+  * `join_lt()` Fast modification
+
 * **2024.07.03    tSQLike-1.1.1**
   * `select_lt()` to accept `<` comparison operator
 
