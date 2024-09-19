@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* **2024.09.19    tSQLike-1.1.3**
+  * `detect_types=False` renamed to `detect_str_types=False`
+  * `str_to_type()` `use_none=False` whether to convert empty strings to `None` or not; Boolean conversion fix
+
 * **2024.07.07    tSQLike-1.1.2**
   * `join_lt()` Fast modification
 

@@ -94,11 +94,18 @@ def close_file(file):
 
 
 # ------------------------------------------------------------------------------------------------ #
-def str_to_type(s):
+def str_to_type(s, use_none=False):
     """ Convert string s to a proper type: int, float or boolean """
 
-    if s in ('True', 'true', 'False', 'false'):                 # to boolean
-        return bool(s)
+    # Convert '' - empty strings to None?
+    if s == '' and use_none:
+        return None
+
+    if s in ('True', 'true'):
+        return True
+
+    if s in ('False', 'false'):
+        return False
 
     try:
         return float(s) if '.' in s or ',' in s else int(s)     # to float and int
@@ -107,38 +114,38 @@ def str_to_type(s):
 
 
 # ------------------------------------------------------------------------------------------------ #
-def read_csv(in_file=None, encoding=None, newline='', name='', detect_types=False,
+def read_csv(in_file=None, encoding=None, newline='', name='', detect_str_types=False,
              dialect='excel', **fmtparams):
     """
     Read CSV from a file and import into a Table object
 
-    :param in_file:         Filename to read CSV from
-    :param encoding:        Character encoding
-    :param newline:         UNIX/Windows/Mac style line ending
-    :param name:            Table name to assign
-    :param detect_types:    Detect and correct types of data, default - False
-    :param dialect:         CSV dialect, e.g: excel, unix
-    :**fmtparams:           Various optional CSV parameters:
-        :param delimiter:   CSV field delimiter
-        :param quotechar:   CSV quote character
-        :param quoting:     CSV quote style
+    :param in_file:             Filename to read CSV from
+    :param encoding:            Character encoding
+    :param newline:             UNIX/Windows/Mac style line ending
+    :param name:                Table name to assign
+    :param detect_str_types:    Detect and correct types of data, default - False
+    :param dialect:             CSV dialect, e.g: excel, unix
+    :**fmtparams:               Various optional CSV parameters:
+        :param delimiter:       CSV field delimiter
+        :param quotechar:       CSV quote character
+        :param quoting:         CSV quote style
     :return: Table
     """
 
     f = open_file(in_file, file_mode='r', encoding=encoding, newline=newline)
     _data = csv.reader(f, dialect=dialect, **fmtparams)
-    t = Table(data=list(_data), name=name, detect_types=detect_types)
+    t = Table(data=list(_data), name=name, detect_str_types=detect_str_types)
     close_file(f)
     return t
 
 
 # -------------------------------------------------------------------------------------------- #
-def read_json(in_file=None, name='', detect_types=False):
+def read_json(in_file=None, name='', detect_str_types=False):
     """ Read JSON data from file
 
     :param in_file:         Filename to read JSON from
     :param name:            Table name to assign
-    :param detect_types:    Detect and correct types of data, default - False
+    :param detect_str_types:    Detect and correct types of data, default - False
     :return                 Table
     """
 
@@ -148,7 +155,7 @@ def read_json(in_file=None, name='', detect_types=False):
         _data = json.load(f)
     except (IOError, OSError) as _err:
         print(f'FATAL@Table.read_json(): Unable to load JSON structure: {_err}')
-    t = Table(data=_data, name=name, detect_types=detect_types)
+    t = Table(data=_data, name=name, detect_str_types=detect_str_types)
     close_file(f)
     return t
 
@@ -217,7 +224,7 @@ class Table:
     """
 
     # -------------------------------------------------------------------------------------------- #
-    def __init__(self, data=None, name=None, detect_types=False):
+    def __init__(self, data=None, name=None, detect_str_types=False, use_none=False):
         self.timestamp = int(time.time())
         self.name = name or str(self.timestamp)
 
@@ -228,13 +235,13 @@ class Table:
             self.cols = 0
         elif isinstance(data, list) and len(data):
             if isinstance(data[0], dict):                   # list(dicts())
-                self.import_list_dicts(data, detect_types=detect_types)
+                self.import_list_dicts(data, detect_str_types=detect_str_types, use_none=use_none)
             if isinstance(data[0], list):                   # list(lists())
-                self.import_list_lists(data, detect_types=detect_types)
+                self.import_list_lists(data, detect_str_types=detect_str_types, use_none=use_none)
         elif isinstance(data, dict) and len(data):
             print(type(next(iter(data))))
             if isinstance(data[next(iter(data))], list):    # dict(lists()):
-                self.import_dict_lists(data, detect_types=detect_types)
+                self.import_dict_lists(data, detect_str_types=detect_str_types, use_none=use_none)
         else:
             raise ValueError('FATAL@Table.__init__: Unexpected data format')
 
@@ -260,15 +267,16 @@ class Table:
         self.cols = self.rows and len(self.table[0]) or 0
 
     # -- Import methods -------------------------------------------------------------------------- #
-    def import_list_dicts(self, data, name=None, detect_types=False):
+    def import_list_dicts(self, data, name=None, detect_str_types=False, use_none=False):
         """
         Import a list of dictionaries
 
-        :alias:                 import_thashes()
-        :param data:            Data to import formatted as list of dictionaries
-        :param name:            If not None, set it as the Table name
-        :param detect_types:    Detect and correct types of data, default - False
-        :return:                self
+        :alias:                     import_thashes()
+        :param data:                Data to import formatted as list of dictionaries
+        :param name:                If not None, set it as the Table name
+        :param detect_str_types:    Detect and correct types of data, default - False
+        :param use_none:            Use None type for empty, i.e. '', strings
+        :return:                    self
         """
 
         # Set a new Table name if requested
@@ -279,8 +287,8 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
-            self.table = [list(r.values()) for r in data] if not detect_types else [
-                [str_to_type(v) for v in r.values()] for r in data]
+            self.table = [list(r.values()) for r in data] if not detect_str_types else [
+                [str_to_type(v, use_none) for v in r.values()] for r in data]
 
         else:
             raise ValueError('FATAL@Table.import_list_dicts: Unexpected data format')
@@ -291,7 +299,7 @@ class Table:
         return self
 
     # -------------------------------------------------------------------------------------------- #
-    def import_dict_lists(self, data, name=None, detect_types=False):
+    def import_dict_lists(self, data, name=None, detect_str_types=False, use_none=False):
         """
         Import a dictionary of lists
         """
@@ -309,7 +317,7 @@ class Table:
 
             for c, f in enumerate(data.keys()):
                 for r, v in enumerate(data[f]):
-                    self.table[r][c] = v if not detect_types else str_to_type(v)
+                    self.table[r][c] = v if not detect_str_types else str_to_type(v, use_none)
             self._redimension()
         else:
             raise ValueError('FATAL@Table.import_dict_lists: Unexpected data format')
@@ -318,14 +326,15 @@ class Table:
         return self
 
     # -------------------------------------------------------------------------------------------- #
-    def import_list_lists(self, data, header=True, name=None, detect_types=False):
+    def import_list_lists(self, data, header=True, name=None,
+                          detect_str_types=False, use_none=False):
         """
         Import list(list_1(), list_n()) with optional first row as the header
 
         :param data:            Data to import formatted as list of lists
         :param header:          If true, data to import HAS a header
         :param name:            If not None, set it as the Table name
-        :param detect_types:    Detect and correct types of data, default - False
+        :param detect_str_types:    Detect and correct types of data, default - False
         :return:                self
         """
 
@@ -335,10 +344,10 @@ class Table:
 
         if isinstance(data, list) and len(data) and isinstance(data[0], list):
             # TODO: Check all rows to be equal length
-            if not detect_types:
+            if not detect_str_types:
                 self.table = data[1:] if header else data
             else:
-                self.table = [[str_to_type(v) for v in r] for r in data[1:]]
+                self.table = [[str_to_type(v, use_none) for v in r] for r in data[1:]]
 
             self._redimension()
 
@@ -399,7 +408,7 @@ class Table:
             for r in self.table:                                    # and the body of the table
                 wr.writerow(r)
         except BrokenPipeError as _err:
-            print(f'FATAL@Table.export_csv: {_err}', file=sys.stderr)
+            print(f'FATAL@Table.write_csv: {_err}', file=sys.stderr)
 
         close_file(f)
 
@@ -460,7 +469,7 @@ class Table:
             f.write(json.dumps(self.export_list_dicts(), indent=indent,
                                separators=separators, sort_keys=sort_keys))
         except (IOError, OSError) as _err:
-            print(f'FATAL@Table.write_json(): {_err}')
+            print(f'FATAL@Table.write_json_lt(): {_err}')
             sys.exit(1)
 
         close_file(f)
