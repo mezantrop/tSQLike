@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.09.20    tSQLike-1.1.4.1**
+  *`convert_bool=True`, `convert_numbers=True`, `use_none=False`, see `str_to_type()` moved to `**kwargs`
+
 * **2024.09.20    tSQLike-1.1.4**
   * `detect_str_types` obsolete by `convert_bool=True`, `convert_numbers=True`, `use_none=False`, see `str_to_type()`
   * `Table()` object, may be passed to a new `Table()` object, i.e., now possible: `Table(Table())`

@@ -118,46 +118,45 @@ def str_to_type(s, convert_bool=True, convert_numbers=True, use_none=False):
 
 
 # ------------------------------------------------------------------------------------------------ #
-def read_csv(in_file=None, encoding=None, newline='', name='',
-             convert_bool=True, convert_numbers=True, use_none=False,
-             dialect='excel', **fmtparams):
+def read_csv(in_file=None, encoding=None, newline='', name='', dialect='excel', **kwargs):
 
     """
     Read CSV from a file and import into a Table object
 
-    :param in_file:         Filename to read CSV from
-    :param encoding:        Character encoding
-    :param newline:         UNIX/Windows/Mac style line ending
-    :param name:            Table name to assign
-    :param convert_bool:    Autoconvert strings into Booleans
-    :param convert_numbers: Autoconvert strings to integers or float
-    :param use_none:        Autoconvert empty strings to None type
-    :param dialect:         CSV dialect, e.g: excel, unix
-    :**fmtparams:           Various optional CSV parameters:
-        :param delimiter:   CSV field delimiter
-        :param quotechar:   CSV quote character
-        :param quoting:     CSV quote style
+    :param in_file:             Filename to read CSV from
+    :param encoding:            Character encoding
+    :param newline:             UNIX/Windows/Mac style line ending
+    :param name:                Table name to assign
+    :param dialect:             CSV dialect, e.g: excel, unix
+    :param **kwargs:            Various optional string conversion and CSV parameters:
+        :param delimiter:       CSV field delimiter
+        :param quotechar:       CSV quote character
+        :param quoting:         CSV quote style
+        :param convert_bool:    Convert strings into Booleans
+        :param convert_numbers: Convert strings to integers or float
+        :param use_none:        Convert empty strings to None type
     :return: Table
     """
 
     f = open_file(in_file, file_mode='r', encoding=encoding, newline=newline)
+    fmtparams={}|kwargs
     _data = csv.reader(f, dialect=dialect, **fmtparams)
-    t = Table(data=list(_data), name=name,
-              convert_bool=convert_bool, convert_numbers=convert_numbers, use_none=use_none)
+    t = Table(data=list(_data), name=name, **kwargs)
     close_file(f)
     return t
 
 
 # -------------------------------------------------------------------------------------------- #
-def read_json(in_file=None, name='', convert_bool=True, convert_numbers=True, use_none=False):
+def read_json(in_file=None, name='', **kwargs):
     """ Read JSON data from file
 
-    :param in_file:         Filename to read JSON from
-    :param name:            Table name to assign
-    :param convert_bool:    Autoconvert strings into Booleans
-    :param convert_numbers: Autoconvert strings to integers or float
-    :param use_none:        Autoconvert empty strings to None type
-    :return                 Table
+    :param in_file:             Filename to read JSON from
+    :param name:                Table name to assign
+    :param **kwargs:          	optional string conversion parameters:
+        :param convert_bool:    Convert strings into Booleans
+        :param convert_numbers: Convert strings to integers or float
+        :param use_none:        Convert empty strings to None type
+    :return                     Table
     """
 
     _data = {}
@@ -166,8 +165,7 @@ def read_json(in_file=None, name='', convert_bool=True, convert_numbers=True, us
         _data = json.load(f)
     except (IOError, OSError) as _err:
         print(f'FATAL@Table.read_json(): Unable to load JSON structure: {_err}')
-    t = Table(data=_data, name=name,
-              convert_bool=convert_bool, convert_numbers=convert_numbers, use_none=use_none)
+    t = Table(data=_data, name=name, **kwargs)
     close_file(f)
     return t
 
@@ -236,11 +234,14 @@ class Table:
     """
 
     # -------------------------------------------------------------------------------------------- #
-    def __init__(self, data=None, name=None,
-                 convert_bool=True, convert_numbers=True, use_none=False):
+    def __init__(self, data=None, name=None, **kwargs):
 
         self.timestamp = int(time.time())
         self.name = name or str(self.timestamp)
+
+        self.convert_bool = kwargs.get('convert_bool', True)
+        self.convert_numbers = kwargs.get('convert_numbers', True)
+        self.use_none = kwargs.get('use_none', False)
 
         if not data:
             self.table = []
@@ -249,19 +250,15 @@ class Table:
             self.cols = 0
         elif isinstance(data, list) and len(data):
             if isinstance(data[0], dict):                   # list(dicts())
-                self.import_list_dicts(data, convert_bool=convert_bool,
-                                       convert_numbers=convert_numbers, use_none=use_none)
+                self.import_list_dicts(data)
             if isinstance(data[0], list):                   # list(lists())
-                self.import_list_lists(data, convert_bool=convert_bool,
-                                       convert_numbers=convert_numbers, use_none=use_none)
+                self.import_list_lists(data)
         elif isinstance(data, dict) and len(data):
-            if isinstance(data[next(iter(data))], list):    # dict(lists()):
-                self.import_dict_lists(data, convert_bool=convert_bool,
-                                        convert_numbers=convert_numbers, use_none=use_none)
+            if isinstance(data[next(iter(data))], list):    # dict(lists())
+                self.import_dict_lists(data)
         elif isinstance(data, Table):                       # Table()
             # Import/export is done to allow type conversion to happen
-            self.import_list_lists(data.export_list_lists(), convert_bool=convert_bool,
-                                   convert_numbers=convert_numbers, use_none=use_none)
+            self.import_list_lists(data.export_list_lists())
         else:
             raise ValueError('FATAL@Table.__init__: Unexpected data format')
 
@@ -287,19 +284,19 @@ class Table:
         self.cols = self.rows and len(self.table[0]) or 0
 
     # -- Import methods -------------------------------------------------------------------------- #
-    def import_list_dicts(self, data, name=None,
-                          convert_bool=True, convert_numbers=True, use_none=False):
+    def import_list_dicts(self, data, name=None, **kwargs):
 
         """
         Import a list of dictionaries
 
-        :alias:                 import_thashes()
-        :param data:            Data to import formatted as list of dictionaries
-        :param name:            If not None, set it as the Table name
-        :param convert_bool:    Autoconvert strings into Booleans
-        :param convert_numbers: Autoconvert strings to integers or float
-        :param use_none:        Autoconvert empty strings to None type
-        :return:                self
+        :alias:                     import_thashes()
+        :param data:                Data to import formatted as list of dictionaries
+        :param name:                If not None, set it as the Table name
+        :param **kwargs:          	optional string conversion parameters:
+            :param convert_bool:    Convert strings into Booleans
+            :param convert_numbers: Convert strings to integers or float
+            :param use_none:        Convert empty strings to None type
+        :return:                    self
         """
 
         # Set a new Table name if requested
@@ -310,9 +307,10 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
-            self.table = [
-                [str_to_type(v, convert_bool, convert_numbers, use_none) for v in r.values()]
-                    for r in data]
+            cb = kwargs.get('convert_bool', self.convert_bool)
+            cn = kwargs.get('convert_numbers', self.convert_numbers)
+            un = kwargs.get('use_none', self.use_none)
+            self.table = [[str_to_type(v, cb, cn, un) for v in r.values()] for r in data]
 
         else:
             raise ValueError('FATAL@Table.import_list_dicts: Unexpected data format')
@@ -323,8 +321,7 @@ class Table:
         return self
 
     # -------------------------------------------------------------------------------------------- #
-    def import_dict_lists(self, data, name=None,
-                          convert_bool=True, convert_numbers=True, use_none=False):
+    def import_dict_lists(self, data, name=None, **kwargs):
 
         """
         Import a dictionary of lists
@@ -341,9 +338,12 @@ class Table:
             self.table = [[None for _ in range(len(data.keys()))]
                           for _ in range(len(data[next(iter(data))]))]
 
+            cb = kwargs.get('convert_bool', self.convert_bool)
+            cn = kwargs.get('convert_numbers', self.convert_numbers)
+            un = kwargs.get('use_none', self.use_none)
             for c, f in enumerate(data.keys()):
                 for r, v in enumerate(data[f]):
-                    self.table[r][c] = str_to_type(v, convert_bool, convert_numbers, use_none)
+                    self.table[r][c] = str_to_type(v, cb, cn, un)
             self._redimension()
         else:
             raise ValueError('FATAL@Table.import_dict_lists: Unexpected data format')
@@ -352,19 +352,19 @@ class Table:
         return self
 
     # -------------------------------------------------------------------------------------------- #
-    def import_list_lists(self, data, header=True, name=None,
-                          convert_bool=True, convert_numbers=True, use_none=False):
+    def import_list_lists(self, data, header=True, name=None, **kwargs):
 
         """
         Import list(list_1(), list_n()) with optional first row as the header
 
-        :param data:            Data to import formatted as list of lists
-        :param header:          If true, data to import HAS a header
-        :param name:            If not None, set it as the Table name
-        :param convert_bool:    Autoconvert strings into Booleans
-        :param convert_numbers: Autoconvert strings to integers or float
-        :param use_none:        Autoconvert empty strings to None type
-        :return:                self
+        :param data:                Data to import formatted as list of lists
+        :param header:              If True, data to import HAS a header
+        :param name:                If not None, set it as the Table name
+        :param **kwargs:          	optional string conversion parameters:
+            :param convert_bool:    Convert strings into Booleans
+            :param convert_numbers: Convert strings to integers or float
+            :param use_none:        Convert empty strings to None type
+        :return:                    self
         """
 
         # Set a new Table name if requested
@@ -373,8 +373,11 @@ class Table:
 
         if isinstance(data, list) and len(data) and isinstance(data[0], list):
             # TODO: Check all rows to be equal length
-            self.table = [[str_to_type(v, convert_bool, convert_numbers, use_none) for v in r]
-                          for r in data[1:]]
+
+            cb = kwargs.get('convert_bool', self.convert_bool)
+            cn = kwargs.get('convert_numbers', self.convert_numbers)
+            un = kwargs.get('use_none', self.use_none)
+            self.table = [[str_to_type(v, cb, cn, un) for v in r] for r in data[1:]]
 
             self._redimension()
 
