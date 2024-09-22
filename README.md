@@ -53,6 +53,7 @@ The main class of the module
 
 | Name        | Status  | Description                                                                                |
 |-------------|---------|--------------------------------------------------------------------------------------------|
+| `column_map`| &#9745; | Apply a function to a column                                                               |
 | `join`      | &#9745; | Join two Tables (`self` and `table`) on an expression [*](#Warning). Complex, but **slow** |
 | `join_lt`   | &#9745; | Light, limited, **fast** and safe `Join`, that doesn't use `eval()`                        |
 | `select`    | &#9745; | Select column(s) from the `Table` [*](#Warning)                                            |

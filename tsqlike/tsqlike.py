@@ -746,6 +746,7 @@ class Table:
 
     # -------------------------------------------------------------------------------------------- #
     def group_by(self, column='', function=None, ftarget=None, new_tname=''):
+
         """
         GROUP BY primitive of SQL SELECT
 
@@ -763,6 +764,25 @@ class Table:
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=[[column, ftarget]] + [[k, v] for k, v in gd.items()])
 
+    # -------------------------------------------------------------------------------------------- #
+    def column_map(self, column='', function=None, new_tname=''):
+
+        """
+        Apply a function to a column
+        """
+
+        try:
+            col = -1
+            if column != '*':
+                col = self.header.index(column)
+        except ValueError:
+            return Table()
+
+        return Table(name=new_tname if new_tname else
+                     self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
+                     data=[self.header] +
+                     [[function(r[c]) if c == col or column == '*' else
+                       r[c] for c in range(self.cols)] for r in self.table])
 
 # -- MAIN starts here ---------------------------------------------------------------------------- #
 if __name__ == "__main__":
