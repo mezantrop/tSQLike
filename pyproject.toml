@@ -21,6 +21,10 @@ classifiers = [
     "Topic :: File Formats",
 ]
 
+dependencies = [
+  'tssplit',
+]
+
 [project.urls]
 Homepage = "https://github.com/mezantrop/tSQLike"
 Issues = "https://github.com/mezantrop/tSQLike/issues"

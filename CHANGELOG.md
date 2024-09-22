@@ -1,5 +1,10 @@
 # CHANGELOG
 
+* **2024.09.22  Current - tSQLike-1.1.5 (candidate)**
+  * import external `tssplit` module for advanced strings splitting
+  * `select()`, `select_lt()` may contain repetitive column names, specified in a random order
+  * cosmetic changes
+
 * **2024.09.20    tSQLike-1.1.4.1**
   *`convert_bool=True`, `convert_numbers=True`, `use_none=False`, see `str_to_type()` moved to `**kwargs`
 

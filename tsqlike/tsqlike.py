@@ -32,6 +32,8 @@ import sys
 import signal
 import time
 
+from tssplit import tssplit
+
 # -- Constants ----------------------------------------------------------------------------------- #
 # JOIN
 JOIN_INNER = 0
@@ -62,6 +64,7 @@ except ModuleNotFoundError:
 
 # -- Standalone functions ------------------------------------------------------------------------ #
 def open_file(file_name=None, file_mode='r+', encoding=None, newline=None):
+
     """ Open a file """
 
     # Detect default file: STDIN or STDOUT
@@ -83,6 +86,7 @@ def open_file(file_name=None, file_mode='r+', encoding=None, newline=None):
 
 # ------------------------------------------------------------------------------------------------ #
 def close_file(file):
+
     """
     Close the file
 
@@ -95,6 +99,7 @@ def close_file(file):
 
 # ------------------------------------------------------------------------------------------------ #
 def str_to_type(s, convert_bool=True, convert_numbers=True, use_none=False):
+
     """ Convert string s to a proper type: int, float or boolean """
 
     # Convert '' - empty strings to None?
@@ -148,6 +153,7 @@ def read_csv(in_file=None, encoding=None, newline='', name='', dialect='excel', 
 
 # -------------------------------------------------------------------------------------------- #
 def read_json(in_file=None, name='', **kwargs):
+
     """ Read JSON data from file
 
     :param in_file:             Filename to read JSON from
@@ -181,6 +187,7 @@ class EvalCtrl:
 
     # -------------------------------------------------------------------------------------------- #
     def blacklisted(self, stanza):
+
         """
         Checks if there is any of the blacklised words in stanza
 
@@ -195,6 +202,7 @@ class EvalCtrl:
 
     # -------------------------------------------------------------------------------------------- #
     def blacklist_add(self, word):
+
         """
         Add a new word into the black list
 
@@ -208,6 +216,7 @@ class EvalCtrl:
 
     # -------------------------------------------------------------------------------------------- #
     def blacklist_remove(self, word):
+
         """
         Remove the word from the blacklist
 
@@ -222,6 +231,7 @@ class EvalCtrl:
 
 # ------------------------------------------------------------------------------------------------ #
 class Table:
+
     """
     Represents an tSQLike Table object with the below structure:
         * name:         string()
@@ -278,6 +288,7 @@ class Table:
 
     # -------------------------------------------------------------------------------------------- #
     def _redimension(self):
+
         """ Recalculate dimensions of the Table.table """
 
         self.rows = len(self.table)
@@ -396,6 +407,7 @@ class Table:
 
     # -- Export data ----------------------------------------------------------------------------- #
     def export_list_dicts(self):
+
         """ Export as list of dictionaries """
 
         return [{self.header[c]: r[c] for c in range(self.cols)} for r in self.table]
@@ -445,6 +457,7 @@ class Table:
     # -------------------------------------------------------------------------------------------- #
     def write_json(self, out_file=None, export_f='export_list_dicts()',
                    indent=None, separators=None, sort_keys=False, evalctrl=EvalCtrl()):
+
         """
         Make JSON from the Table object and write it to a file or stdout
 
@@ -484,6 +497,7 @@ class Table:
 
     # -------------------------------------------------------------------------------------------- #
     def write_json_lt(self, out_file=None, indent=None, separators=None, sort_keys=False):
+
         """
         Lite, no eval() version of write_json() method
 
@@ -512,6 +526,7 @@ class Table:
 
     # -- Data processing ------------------------------------------------------------------------- #
     def join(self, table, on='', mode=JOIN_INNER, new_tname='', replace=False, evalctrl=EvalCtrl()):
+
         """Join two Tables (self and table) on an expression
 
         :param table:       Table to join self with
@@ -657,15 +672,17 @@ class Table:
 
         r_table = [[]]
         r_columns = []
-        columns = self.header if columns == '*' else columns.split(',')
+        columns = self.header if columns == '*' else tssplit(columns, delimiter=', \t',
+                                                             quote='', escape='', trim='',
+                                                             remark='')
 
         if where:
             bl = evalctrl.blacklisted(where)
             if bl[0]:
                 raise ValueError(f'FATAL@select: Found blacklisted expression: [{bl[1]}]')
 
-        for column in self.header:
-            if column in columns:
+        for column in columns:
+            if column in self.header:
                 c_idx = self.header.index(column)
                 if where:
                     where = where.replace(column, 'r[' + str(c_idx) + ']')
@@ -695,10 +712,12 @@ class Table:
 
         r_table = [[]]
         r_columns = []
-        columns = self.header if columns in ('*', '') else columns.split(',')
+        columns = self.header if columns in ('*', '') else tssplit(columns, delimiter=', \t',
+                                                                   quote='', escape='', trim='',
+                                                                   remark='')
 
-        for column in self.header:
-            if column in columns:
+        for column in columns:
+            if column in self.header:
                 r_table[0].append(column)
                 r_columns.append(self.header.index(column))
 
@@ -781,8 +800,8 @@ class Table:
         return Table(name=new_tname if new_tname else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=[self.header] +
-                     [[function(r[c]) if c == col or column == '*' else
-                       r[c] for c in range(self.cols)] for r in self.table])
+                        [[function(r[c]) if c == col or column == '*' else
+                            r[c] for c in range(self.cols)] for r in self.table])
 
 # -- MAIN starts here ---------------------------------------------------------------------------- #
 if __name__ == "__main__":
