@@ -246,12 +246,28 @@ class Table:
     # -------------------------------------------------------------------------------------------- #
     def __init__(self, data=None, name=None, **kwargs):
 
+        """
+        Initialize Table() object
+
+        :param data:                Data to import formatted as list of dictionaries
+        :param name:                If not None, set it as the Table name
+        :param **kwargs:          	optional string conversion parameters:
+            :param convert_bool:    Convert strings into Booleans
+            :param convert_numbers: Convert strings to integers or float
+            :param use_none:        Convert empty strings to None type
+            :param globals:         Pass globals into the object
+        """
+
         self.timestamp = int(time.time())
         self.name = name or str(self.timestamp)
 
         self.convert_bool = kwargs.get('convert_bool', True)
         self.convert_numbers = kwargs.get('convert_numbers', True)
         self.use_none = kwargs.get('use_none', False)
+        # Pass globals=globals() when creating a Table object,
+        # to allow select() using custom defined functions
+        self.globals = kwargs.get('globals', {})
+        self.use_shortnames = kwargs.get('use_shortnames', False)
 
         if not data:
             self.table = []
@@ -293,6 +309,14 @@ class Table:
 
         self.rows = len(self.table)
         self.cols = self.rows and len(self.table[0]) or 0
+
+    # -------------------------------------------------------------------------------------------- #
+    def _make_shortnames(self):
+
+        """Remove Table name from column names in the Table header"""
+
+        return [h.split(TNAME_COLUMN_DELIMITER)[1]
+                for h in self.header if h.startswith(self.name + TNAME_COLUMN_DELIMITER)]
 
     # -- Import methods -------------------------------------------------------------------------- #
     def import_list_dicts(self, data, name=None, **kwargs):
@@ -406,23 +430,29 @@ class Table:
         return self
 
     # -- Export data ----------------------------------------------------------------------------- #
-    def export_list_dicts(self):
+    def export_list_dicts(self, **kwargs):
 
         """ Export as list of dictionaries """
 
-        return [{self.header[c]: r[c] for c in range(self.cols)} for r in self.table]
+        sn = kwargs.get('use_shortnames', self.use_shortnames)
+        return [{self._make_shortnames()[c] if sn else self.header[c]: r[c] for c in range(self.cols)} for r in self.table]
 
     # -------------------------------------------------------------------------------------------- #
-    def export_list_lists(self, header=True):
+    def export_list_lists(self, header=True, **kwargs):
+
         """ Export Table """
 
-        return [self.header] + self.table if header else self.table
+        sn = kwargs.get('use_shortnames', self.use_shortnames)
+        return ([self._make_shortnames() if sn else self.header] +
+                self.table) if header else self.table
 
     # -------------------------------------------------------------------------------------------- #
-    def export_dict_lists(self):
+    def export_dict_lists(self, **kwargs):
+
         """ Export a dictionary of lists """
 
-        return {self.header[c]: [self.table[r][c]
+        sn = kwargs.get('use_shortnames', self.use_shortnames)
+        return {self._make_shortnames()[c] if sn else self.header[c]: [self.table[r][c]
                                  for r in range(self.rows)] for c in range(self.cols)}
 
     # -------------------------------------------------------------------------------------------- #
@@ -446,8 +476,10 @@ class Table:
         wr = csv.writer(f, dialect=dialect, lineterminator=lineterminator, **fmtparams)
 
         try:
-            wr.writerow(self.header)                                # Write the header ...
-            for r in self.table:                                    # and the body of the table
+            # Write the header ...
+            wr.writerow(self._make_shortnames() if self.use_shortnames else self.header)
+            # and the body of the table
+            for r in self.table:
                 wr.writerow(r)
         except BrokenPipeError as _err:
             print(f'FATAL@Table.write_csv: {_err}', file=sys.stderr)
@@ -688,7 +720,8 @@ class Table:
                     if where:
                         where = where.replace(_column, 'r[' + str(c_idx) + ']')
                     ev_column = column.replace(_column, 'r[' + str(c_idx) + ']')
-                    r_columns.append(eval(compile('lambda r:' + ev_column, '<string>', 'eval')))
+                    r_columns.append(eval(compile('lambda r:' + ev_column, '<string>', 'eval'),
+                                          self.globals))
                     r_table[0].append(column)
 
         if not where:
