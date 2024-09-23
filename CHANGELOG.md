@@ -1,6 +1,7 @@
 # CHANGELOG
 
 * **2024.09.23  Current - tSQLike-1.1.5 (candidate)**
+  * `use_shortnames` in `select()` method
   * `export_*()`/`write_*()` methods respect `self.|use_shortnames=True` to outut Table header ommitting Table name
   * `select()` supports applying functions to columns, eg. `select(columns='int(first.h1), first.h3.upper()')`
   * import external `tssplit` module for advanced strings splitting

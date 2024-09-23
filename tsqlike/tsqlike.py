@@ -311,12 +311,15 @@ class Table:
         self.cols = self.rows and len(self.table[0]) or 0
 
     # -------------------------------------------------------------------------------------------- #
-    def _make_shortnames(self):
+    def _make_shortnames(self, header=''):
 
         """Remove Table name from column names in the Table header"""
 
+        if not header:
+            header = self.header
+
         return [h.split(TNAME_COLUMN_DELIMITER)[1]
-                for h in self.header if h.startswith(self.name + TNAME_COLUMN_DELIMITER)]
+                       if h.startswith(self.name + TNAME_COLUMN_DELIMITER) else h for h in header]
 
     # -- Import methods -------------------------------------------------------------------------- #
     def import_list_dicts(self, data, name=None, **kwargs):
@@ -691,7 +694,7 @@ class Table:
                      else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table)
 
     # -------------------------------------------------------------------------------------------- #
-    def select(self, columns='*', where='', new_tname='', evalctrl=EvalCtrl()):
+    def select(self, columns='*', where='', new_tname='', evalctrl=EvalCtrl(), **kwargs):
 
         """Select one or more columns from the Table if condition "where" is met.
         Return a new Table object
@@ -709,15 +712,20 @@ class Table:
                                                              quote='', escape='', trim='',
                                                              remark='')
 
+        header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            columns = self._make_shortnames(header=columns)
+            header = self._make_shortnames()
+
         if where:
             bl = evalctrl.blacklisted(where)
             if bl[0]:
                 raise ValueError(f'FATAL@select: Found blacklisted expression: [{bl[1]}]')
 
         for column in columns:
-            for _column in self.header:
+            for _column in header:
                 if _column in column:
-                    c_idx = self.header.index(_column)
+                    c_idx = header.index(_column)
                     if where:
                         where = where.replace(_column, 'r[' + str(c_idx) + ']')
                     ev_column = column.replace(_column, 'r[' + str(c_idx) + ']')
