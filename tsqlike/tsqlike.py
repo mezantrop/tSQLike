@@ -435,7 +435,8 @@ class Table:
         """ Export as list of dictionaries """
 
         sn = kwargs.get('use_shortnames', self.use_shortnames)
-        return [{self._make_shortnames()[c] if sn else self.header[c]: r[c] for c in range(self.cols)} for r in self.table]
+        return [{self._make_shortnames()[c] if sn else self.header[c]:
+                 r[c] for c in range(self.cols)} for r in self.table]
 
     # -------------------------------------------------------------------------------------------- #
     def export_list_lists(self, header=True, **kwargs):
