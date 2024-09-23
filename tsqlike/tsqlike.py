@@ -682,12 +682,14 @@ class Table:
                 raise ValueError(f'FATAL@select: Found blacklisted expression: [{bl[1]}]')
 
         for column in columns:
-            if column in self.header:
-                c_idx = self.header.index(column)
-                if where:
-                    where = where.replace(column, 'r[' + str(c_idx) + ']')
-                r_table[0].append(column)
-                r_columns.append(c_idx)
+            for _column in self.header:
+                if _column in column:
+                    c_idx = self.header.index(_column)
+                    if where:
+                        where = where.replace(_column, 'r[' + str(c_idx) + ']')
+                    ev_column = column.replace(_column, 'r[' + str(c_idx) + ']')
+                    r_columns.append(eval(compile('lambda r:' + ev_column, '<string>', 'eval')))
+                    r_table[0].append(column)
 
         if not where:
             where = 'True'
@@ -696,7 +698,7 @@ class Table:
 
         return Table(name=new_tname if new_tname else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
-                     data=r_table + [[r[c] for c in r_columns] for r in self.table if efunc(r)])
+                     data=r_table + [[sf(r) for sf in r_columns] for r in self.table if efunc(r)])
 
     # -------------------------------------------------------------------------------------------- #
     def select_lt(self, columns='*', where='', comp='==', val='', new_tname=''):
