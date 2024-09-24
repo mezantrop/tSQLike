@@ -860,7 +860,8 @@ class Table:
         """
 
         if not ftarget or not function:
-            return Table(self)
+            return Table(name=new_tname if new_tname else
+                     self.name + TNAME_TNAME_DELIMITER + str(self.timestamp), data=self.table)
 
         header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
@@ -875,16 +876,24 @@ class Table:
                      data=[[column, ftarget]] + [[k, v] for k, v in gd.items()])
 
     # -------------------------------------------------------------------------------------------- #
-    def column_map(self, column='', function=None, new_tname=''):
+    def column_map(self, column='', function=None, new_tname='', **kwargs):
 
         """
         Apply a function to a column
         """
 
+        if not function:
+            return Table(name=new_tname if new_tname else
+                     self.name + TNAME_TNAME_DELIMITER + str(self.timestamp), data=self.table)
+
+        header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            header = self.make_shortnames()
+
         try:
             col = -1
             if column != '*':
-                col = self.header.index(column)
+                col = header.index(column)
         except ValueError:
             return Table()
 
