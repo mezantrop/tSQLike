@@ -1,6 +1,7 @@
 # CHANGELOG
 
 * **2024.09.24  Current - tSQLike-1.1.5 (candidate)**
+  * `group_by()` respects `use_shortnames`; `group_by()` to handle case with no `ftarget` or `function` arguments
   * `order_by()` respects `use_shortnames`
   * `join_lt()` respects `use_shortnames` for both Tables
   * make `_make_shortnames()` method public

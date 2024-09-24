@@ -845,19 +845,29 @@ class Table:
                                             for c in range(self.cols)] for r in sl])
 
     # -------------------------------------------------------------------------------------------- #
-    def group_by(self, column='', function=None, ftarget=None, new_tname=''):
+    def group_by(self, column='', function=None, ftarget=None, new_tname='', **kwargs):
 
         """
         GROUP BY primitive of SQL SELECT
 
-        :param column:      Group by this column
-        :param function:    Aggregate function to apply
-        :param ftarget:     Column to apply aggregate function
-        :param new_tname:   Give a new name for the returned Table
-        :return:            A new Table object
+        :param column:              Group by this column
+        :param function:            Aggregate function to apply
+        :param ftarget:             Column to apply aggregate function
+        :param new_tname:           Give a new name for the returned Table
+        :param **kwargs:
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
+        :return:                    A new Table object
         """
 
-        gd = {r[self.header.index(column)]: function(r[self.header.index(ftarget)])
+        if not ftarget or not function:
+            return Table(self)
+
+        header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            header = self.make_shortnames()
+
+
+        gd = {r[header.index(column)]: function(r[header.index(ftarget)])
               for r in self.table}
 
         return Table(name=new_tname if new_tname else
