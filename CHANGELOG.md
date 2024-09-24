@@ -1,7 +1,7 @@
 # CHANGELOG
 
 * **2024.09.24  Current - tSQLike-1.1.5 (candidate)**
-  * `join()` respects `use_shortnames` for both Tables
+  * `join_lt()` respects `use_shortnames` for both Tables
   * make `_make_shortnames()` method public
   * `join()` respects `use_shortnames` for self Table
   * `select_lt()` method respects `use_shortnames` variable
