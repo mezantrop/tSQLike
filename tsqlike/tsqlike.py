@@ -256,6 +256,7 @@ class Table:
             :param convert_numbers: Convert strings to integers or float
             :param use_none:        Convert empty strings to None type
             :param globals:         Pass globals into the object
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
         """
 
         self.timestamp = int(time.time())
@@ -334,6 +335,7 @@ class Table:
             :param convert_bool:    Convert strings into Booleans
             :param convert_numbers: Convert strings to integers or float
             :param use_none:        Convert empty strings to None type
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
         :return:                    self
         """
 
@@ -402,6 +404,7 @@ class Table:
             :param convert_bool:    Convert strings into Booleans
             :param convert_numbers: Convert strings to integers or float
             :param use_none:        Convert empty strings to None type
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
         :return:                    self
         """
 
@@ -563,18 +566,25 @@ class Table:
         # TODO: Implement me
 
     # -- Data processing ------------------------------------------------------------------------- #
-    def join(self, table, on='', mode=JOIN_INNER, new_tname='', replace=False, evalctrl=EvalCtrl()):
+    def join(self, table, on='', mode=JOIN_INNER, new_tname='', replace=False,
+             evalctrl=EvalCtrl(), **kwargs):
 
         """Join two Tables (self and table) on an expression
 
-        :param table:       Table to join self with
-        :param on:          Valid Python expression
-        :param mode:        Join mode
-        :param new_tname:   Give a name of the returned Table
-        :param replace:     Replace source with the new data or not
-        :param evalctrl:    eval() controlling class
-        :return:            self
+        :param table:               Table to join self with
+        :param on:                  Valid Python expression
+        :param mode:                Join mode
+        :param new_tname:           Give a name of the returned Table
+        :param replace:             Replace source with the new data or not
+        :param evalctrl:            eval() controlling class
+        :param **kwargs:
+            :param use_shortnames   If True, Columns of Self Table header do not contain Table name
+        :return:                    self
         """
+
+        s_header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            s_header = self._make_shortnames()
 
         # Replace 'on' to work with eval() on per row entry
         if on:
@@ -582,12 +592,12 @@ class Table:
             if bl[0]:
                 raise ValueError(f'FATAL@Table.join: Found blacklisted expression: [{bl[1]}]')
 
-            for column in self.header:
-                if column in on:
-                    on = on.replace(column, 'tl[' + str(self.header.index(column)) + ']')
             for column in table.header:
                 if column in on:
                     on = on.replace(column, 'tr[' + str(table.header.index(column)) + ']')
+            for column in s_header:
+                if column in on:
+                    on = on.replace(column, 'tl[' + str(s_header.index(column)) + ']')
         else:
             on = 'True'                             # Will perform FULL JOIN
 
@@ -701,11 +711,13 @@ class Table:
         """Select one or more columns from the Table if condition "where" is met.
         Return a new Table object
 
-        :param columns:     Columns of the Table or '*' to return
-        :param where:       Valid Python expression
-        :param new_tname:   Give a name of the returned Table
-        :param evalctrl:    eval() controlling class
-        :return:            A new Table object
+        :param columns:             Columns of the Table or '*' to return
+        :param where:               Valid Python expression
+        :param new_tname:           Give a name of the returned Table
+        :param evalctrl:            eval() controlling class
+        :param **kwargs:
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
+        :return:                    A new Table object
         """
 
         r_table = [[]]
@@ -749,12 +761,14 @@ class Table:
 
         """ eval()-free version of select()
 
-        :param columns:     Columns of the Table or '*' to return
-        :param where:       Column name
-        :param comp:        Comparison or membership operator
-        :param val:         Value to compare with
-        :param new_tname:   Give a name of the returned Table
-        :return:            A new Table object
+        :param columns:             Columns of the Table or '*' to return
+        :param where:               Column name
+        :param comp:                Comparison or membership operator
+        :param val:                 Value to compare with
+        :param new_tname:           Give a name of the returned Table
+        :param **kwargs:
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
+        :return:                    A new Table object
         """
 
         r_table = [[]]
