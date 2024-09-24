@@ -814,7 +814,7 @@ class Table:
                                      comp == 'not in' and _type(r[scol_idx]) not in val])
 
     # -------------------------------------------------------------------------------------------- #
-    def order_by(self, column='', direction=ORDER_BY_INC, new_tname=''):
+    def order_by(self, column='', direction=ORDER_BY_INC, new_tname='', **kwargs):
 
         """
         ORDER BY primitive of SQL SELECT
@@ -822,11 +822,19 @@ class Table:
         :param column:      Order by this column
         :param direction:   Sort direction ORDER_BY_INC or ORDER_BY_DEC to specify sorting order
         :param new_tname:   Give a new name for the returned Table
+        :param **kwargs:
+            :param use_shortnames   if True, Column names in Table header do not contain Table name
+
         :return:            A new Table object
         """
 
+        header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            header = self.make_shortnames()
+
+
         # Extract a column referenced by order_by and sort it
-        sl = [(self.table[r][self.header.index(column)], r) for r in range(self.rows)]
+        sl = [(self.table[r][header.index(column)], r) for r in range(self.rows)]
         sl.sort()
         if direction != ORDER_BY_INC:               # Assuming the decreasing order is desired
             sl = sl[::-1]
