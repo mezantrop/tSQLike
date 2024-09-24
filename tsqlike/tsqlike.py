@@ -557,7 +557,9 @@ class Table:
 
     # -------------------------------------------------------------------------------------------- #
     def write_xml(self):
+
         """ Not implemented """
+
         # TODO: Implement me
 
     # -- Data processing ------------------------------------------------------------------------- #
@@ -743,7 +745,8 @@ class Table:
                      data=r_table + [[sf(r) for sf in r_columns] for r in self.table if efunc(r)])
 
     # -------------------------------------------------------------------------------------------- #
-    def select_lt(self, columns='*', where='', comp='==', val='', new_tname=''):
+    def select_lt(self, columns='*', where='', comp='==', val='', new_tname='', **kwargs):
+
         """ eval()-free version of select()
 
         :param columns:     Columns of the Table or '*' to return
@@ -760,17 +763,22 @@ class Table:
                                                                    quote='', escape='', trim='',
                                                                    remark='')
 
-        for column in columns:
-            if column in self.header:
+        header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            columns = self._make_shortnames(header=columns)
+            header = self._make_shortnames()
+
+        for column in header:
+            if column in columns:
                 r_table[0].append(column)
-                r_columns.append(self.header.index(column))
+                r_columns.append(header.index(column))
 
         if not where or not comp or not val:
             return Table(name=new_tname if new_tname else
                          self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                          data=r_table + [[r[c] for c in r_columns] for r in self.table])
 
-        scol_idx = self.header.index(where)
+        scol_idx = header.index(where)
         _type = type(val)
         return Table(name=new_tname if new_tname else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
@@ -787,6 +795,7 @@ class Table:
 
     # -------------------------------------------------------------------------------------------- #
     def order_by(self, column='', direction=ORDER_BY_INC, new_tname=''):
+
         """
         ORDER BY primitive of SQL SELECT
 

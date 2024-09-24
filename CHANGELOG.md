@@ -1,6 +1,7 @@
 # CHANGELOG
 
-* **2024.09.23  Current - tSQLike-1.1.5 (candidate)**
+* **2024.09.24  Current - tSQLike-1.1.5 (candidate)**
+  * `select_lt()` method respects `use_shortnames` variable
   * `use_shortnames` in `select()` method
   * `export_*()`/`write_*()` methods respect `self.|use_shortnames=True` to outut Table header ommitting Table name
   * `select()` supports applying functions to columns, eg. `select(columns='int(first.h1), first.h3.upper()')`
