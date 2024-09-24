@@ -312,7 +312,7 @@ class Table:
         self.cols = self.rows and len(self.table[0]) or 0
 
     # -------------------------------------------------------------------------------------------- #
-    def _make_shortnames(self, header=''):
+    def make_shortnames(self, header=''):
 
         """Remove Table name from column names in the Table header"""
 
@@ -441,7 +441,7 @@ class Table:
         """ Export as list of dictionaries """
 
         sn = kwargs.get('use_shortnames', self.use_shortnames)
-        return [{self._make_shortnames()[c] if sn else self.header[c]:
+        return [{self.make_shortnames()[c] if sn else self.header[c]:
                  r[c] for c in range(self.cols)} for r in self.table]
 
     # -------------------------------------------------------------------------------------------- #
@@ -450,7 +450,7 @@ class Table:
         """ Export Table """
 
         sn = kwargs.get('use_shortnames', self.use_shortnames)
-        return ([self._make_shortnames() if sn else self.header] +
+        return ([self.make_shortnames() if sn else self.header] +
                 self.table) if header else self.table
 
     # -------------------------------------------------------------------------------------------- #
@@ -459,7 +459,7 @@ class Table:
         """ Export a dictionary of lists """
 
         sn = kwargs.get('use_shortnames', self.use_shortnames)
-        return {self._make_shortnames()[c] if sn else self.header[c]: [self.table[r][c]
+        return {self.make_shortnames()[c] if sn else self.header[c]: [self.table[r][c]
                                  for r in range(self.rows)] for c in range(self.cols)}
 
     # -------------------------------------------------------------------------------------------- #
@@ -484,7 +484,7 @@ class Table:
 
         try:
             # Write the header ...
-            wr.writerow(self._make_shortnames() if self.use_shortnames else self.header)
+            wr.writerow(self.make_shortnames() if self.use_shortnames else self.header)
             # and the body of the table
             for r in self.table:
                 wr.writerow(r)
@@ -584,7 +584,7 @@ class Table:
 
         s_header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
-            s_header = self._make_shortnames()
+            s_header = self.make_shortnames()
 
         # Replace 'on' to work with eval() on per row entry
         if on:
@@ -638,7 +638,7 @@ class Table:
                      else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table)
 
     # -------------------------------------------------------------------------------------------- #
-    def join_lt(self, table, scol, tcol, mode=JOIN_INNER, new_tname='', replace=False):
+    def join_lt(self, table, scol, tcol, mode=JOIN_INNER, new_tname='', replace=False, **kwargs):
 
         """
         Light, limited and safe Join, that doesn't use eval()
@@ -651,8 +651,14 @@ class Table:
         :return:            self
         """
 
-        lci = self.header.index(scol) if scol in self.header else None
-        rci = table.header.index(tcol) if tcol in table.header else None
+        l_header = self.header
+        r_header = table.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            l_header = self.make_shortnames()
+            r_header = table.make_shortnames()
+
+        rci = r_header.index(tcol) if tcol in r_header else None
+        lci = l_header.index(scol) if scol in l_header else None
 
         if None in (lci, rci):
             return Table()
@@ -728,8 +734,8 @@ class Table:
 
         header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
-            columns = self._make_shortnames(header=columns)
-            header = self._make_shortnames()
+            columns = self.make_shortnames(header=columns)
+            header = self.make_shortnames()
 
         if where:
             bl = evalctrl.blacklisted(where)
@@ -779,8 +785,8 @@ class Table:
 
         header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
-            columns = self._make_shortnames(header=columns)
-            header = self._make_shortnames()
+            columns = self.make_shortnames(header=columns)
+            header = self.make_shortnames()
 
         for column in header:
             if column in columns:

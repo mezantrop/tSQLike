@@ -1,7 +1,9 @@
 # CHANGELOG
 
 * **2024.09.24  Current - tSQLike-1.1.5 (candidate)**
-  * `join()` respects `use_shortnames`
+  * `join()` respects `use_shortnames` for both Tables
+  * make `_make_shortnames()` method public
+  * `join()` respects `use_shortnames` for self Table
   * `select_lt()` method respects `use_shortnames` variable
   * `use_shortnames` in `select()` method
   * `export_*()`/`write_*()` methods respect `self.|use_shortnames=True` to output Table header ommitting Table name
