@@ -86,6 +86,12 @@ The main class of the module
 | `write_json_lt` | &#9745; | `eval()`-free version of `Table.write_json`                         |
 | `write_xml`     | &#9744; | Write `XML`. NB: Do we need this?                                   |
 
+#### Service methods
+
+| Name              | Status  | Description                                                         |
+|-------------------|---------|---------------------------------------------------------------------|
+| `make_shortnames` | &#9745; | Remove Table name from column names in the Table header             |
+
 #### Private methods
 
 | Name           | Status  | Description                               |
