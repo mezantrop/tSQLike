@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* **2024.09.25    tSQLike-1.1.5.1**
+  * Children `Table` objects inherit `convert_bool`, `convert_numbers` and `use_none` from parent
+  * `new_tname` methods argument renamed to `name`
+
 * **2024.09.24    tSQLike-1.1.5**
   * `column_map()` respects `use_shortnames`; handles a case with no `function` argument
   * `group_by()` respects `use_shortnames`; `group_by()` to handle case with no `ftarget` or `function` arguments

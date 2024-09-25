@@ -566,7 +566,7 @@ class Table:
         # TODO: Implement me
 
     # -- Data processing ------------------------------------------------------------------------- #
-    def join(self, table, on='', mode=JOIN_INNER, new_tname='', replace=False,
+    def join(self, table, on='', mode=JOIN_INNER, name='', replace=False,
              evalctrl=EvalCtrl(), **kwargs):
 
         """Join two Tables (self and table) on an expression
@@ -574,7 +574,7 @@ class Table:
         :param table:               Table to join self with
         :param on:                  Valid Python expression
         :param mode:                Join mode
-        :param new_tname:           Give a name of the returned Table
+        :param name:                Give a name of the returned Table
         :param replace:             Replace source with the new data or not
         :param evalctrl:            eval() controlling class
         :param **kwargs:
@@ -585,6 +585,10 @@ class Table:
         s_header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
             s_header = self.make_shortnames()
+
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
 
         # Replace 'on' to work with eval() on per row entry
         if on:
@@ -630,15 +634,16 @@ class Table:
 
         if replace:
             # Replace source - self - with the joined Table
-            return Table.import_list_lists(self, name=new_tname if new_tname else
+            return Table.import_list_lists(self, name=name if name else
                                            self.name + TNAME_TNAME_DELIMITER + table.name,
                                            data=r_table)
         # Return a new Table
-        return Table(name=new_tname if new_tname
-                     else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table)
+        return Table(name=name if name
+                     else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table,
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
     # -------------------------------------------------------------------------------------------- #
-    def join_lt(self, table, scol, tcol, mode=JOIN_INNER, new_tname='', replace=False, **kwargs):
+    def join_lt(self, table, scol, tcol, mode=JOIN_INNER, name='', replace=False, **kwargs):
 
         """
         Light, limited and safe Join, that doesn't use eval()
@@ -646,7 +651,7 @@ class Table:
         :param scol:        Self column to join on
         :param tcol:        Table column to join on
         :param mode:        Join mode
-        :param new_tname:   Give a name of the returned Table
+        :param name:        Give a name of the returned Table
         :param replace:     Replace source with the new data or not
         :return:            self
         """
@@ -656,6 +661,10 @@ class Table:
         if kwargs.get('use_shortnames', self.use_shortnames):
             l_header = self.make_shortnames()
             r_header = table.make_shortnames()
+
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
 
         rci = r_header.index(tcol) if tcol in r_header else None
         lci = l_header.index(scol) if scol in l_header else None
@@ -704,22 +713,23 @@ class Table:
 
         if replace:
             # Replace source - self - with the joined Table
-            return Table.import_list_lists(self, name=new_tname if new_tname else
+            return Table.import_list_lists(self, name=name if name else
                                            self.name + TNAME_TNAME_DELIMITER + table.name,
                                            data=r_table)
         # Return a new Table
-        return Table(name=new_tname if new_tname
-                     else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table)
+        return Table(name=name if name
+                     else self.name + TNAME_TNAME_DELIMITER + table.name, data=r_table,
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
     # -------------------------------------------------------------------------------------------- #
-    def select(self, columns='*', where='', new_tname='', evalctrl=EvalCtrl(), **kwargs):
+    def select(self, columns='*', where='', name='', evalctrl=EvalCtrl(), **kwargs):
 
         """Select one or more columns from the Table if condition "where" is met.
         Return a new Table object
 
         :param columns:             Columns of the Table or '*' to return
         :param where:               Valid Python expression
-        :param new_tname:           Give a name of the returned Table
+        :param name:                Give a name of the returned Table
         :param evalctrl:            eval() controlling class
         :param **kwargs:
             :param use_shortnames   if True, Column names in Table header do not contain Table name
@@ -736,6 +746,10 @@ class Table:
         if kwargs.get('use_shortnames', self.use_shortnames):
             columns = self.make_shortnames(header=columns)
             header = self.make_shortnames()
+
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
 
         if where:
             bl = evalctrl.blacklisted(where)
@@ -758,12 +772,13 @@ class Table:
 
         efunc = eval(compile('lambda r:' + where, '<string>', 'eval'))
 
-        return Table(name=new_tname if new_tname else
+        return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
-                     data=r_table + [[sf(r) for sf in r_columns] for r in self.table if efunc(r)])
+                     data=r_table + [[sf(r) for sf in r_columns] for r in self.table if efunc(r)],
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
     # -------------------------------------------------------------------------------------------- #
-    def select_lt(self, columns='*', where='', comp='==', val='', new_tname='', **kwargs):
+    def select_lt(self, columns='*', where='', comp='==', val='', name='', **kwargs):
 
         """ eval()-free version of select()
 
@@ -771,7 +786,7 @@ class Table:
         :param where:               Column name
         :param comp:                Comparison or membership operator
         :param val:                 Value to compare with
-        :param new_tname:           Give a name of the returned Table
+        :param name:                Give a name of the returned Table
         :param **kwargs:
             :param use_shortnames   if True, Column names in Table header do not contain Table name
         :return:                    A new Table object
@@ -788,19 +803,24 @@ class Table:
             columns = self.make_shortnames(header=columns)
             header = self.make_shortnames()
 
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
+
         for column in header:
             if column in columns:
                 r_table[0].append(column)
                 r_columns.append(header.index(column))
 
         if not where or not comp or not val:
-            return Table(name=new_tname if new_tname else
+            return Table(name=name if name else
                          self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
-                         data=r_table + [[r[c] for c in r_columns] for r in self.table])
+                         data=r_table + [[r[c] for c in r_columns] for r in self.table],
+                         convert_bool=cb, convert_numbers=cn, use_none=un)
 
         scol_idx = header.index(where)
         _type = type(val)
-        return Table(name=new_tname if new_tname else
+        return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=r_table + [[r[c] for c in r_columns]
                                      for r in self.table
@@ -811,20 +831,20 @@ class Table:
                                      comp == '>=' and _type(r[scol_idx]) >= val or
                                      comp == '<=' and _type(r[scol_idx]) <= val or
                                      comp == 'in' and _type(r[scol_idx]) in val or
-                                     comp == 'not in' and _type(r[scol_idx]) not in val])
+                                     comp == 'not in' and _type(r[scol_idx]) not in val],
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
     # -------------------------------------------------------------------------------------------- #
-    def order_by(self, column='', direction=ORDER_BY_INC, new_tname='', **kwargs):
+    def order_by(self, column='', direction=ORDER_BY_INC, name='', **kwargs):
 
         """
         ORDER BY primitive of SQL SELECT
 
-        :param column:      Order by this column
-        :param direction:   Sort direction ORDER_BY_INC or ORDER_BY_DEC to specify sorting order
-        :param new_tname:   Give a new name for the returned Table
+        :param column:          Order by this column
+        :param direction:       Sort direction ORDER_BY_INC/ORDER_BY_DEC to specify sorting order
+        :param name:            Give a new name for the returned Table
         :param **kwargs:
             :param use_shortnames   if True, Column names in Table header do not contain Table name
-
         :return:            A new Table object
         """
 
@@ -832,6 +852,9 @@ class Table:
         if kwargs.get('use_shortnames', self.use_shortnames):
             header = self.make_shortnames()
 
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
 
         # Extract a column referenced by order_by and sort it
         sl = [(self.table[r][header.index(column)], r) for r in range(self.rows)]
@@ -839,13 +862,14 @@ class Table:
         if direction != ORDER_BY_INC:               # Assuming the decreasing order is desired
             sl = sl[::-1]
 
-        return Table(name=new_tname if new_tname else
+        return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=[self.header] + [[self.table[r[1]][c]
-                                            for c in range(self.cols)] for r in sl])
+                                            for c in range(self.cols)] for r in sl],
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
     # -------------------------------------------------------------------------------------------- #
-    def group_by(self, column='', function=None, ftarget=None, new_tname='', **kwargs):
+    def group_by(self, column='', function=None, ftarget=None, name='', **kwargs):
 
         """
         GROUP BY primitive of SQL SELECT
@@ -853,42 +877,50 @@ class Table:
         :param column:              Group by this column
         :param function:            Aggregate function to apply
         :param ftarget:             Column to apply aggregate function
-        :param new_tname:           Give a new name for the returned Table
+        :param name:                Give a new name for the returned Table
         :param **kwargs:
             :param use_shortnames   if True, Column names in Table header do not contain Table name
         :return:                    A new Table object
         """
 
         if not ftarget or not function:
-            return Table(name=new_tname if new_tname else
+            return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp), data=self.table)
 
         header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
             header = self.make_shortnames()
 
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
 
         gd = {r[header.index(column)]: function(r[header.index(ftarget)])
               for r in self.table}
 
-        return Table(name=new_tname if new_tname else
+        return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
-                     data=[[column, ftarget]] + [[k, v] for k, v in gd.items()])
+                     data=[[column, ftarget]] + [[k, v] for k, v in gd.items()],
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
     # -------------------------------------------------------------------------------------------- #
-    def column_map(self, column='', function=None, new_tname='', **kwargs):
+    def column_map(self, column='', function=None, name='', **kwargs):
 
         """
         Apply a function to a column
         """
 
         if not function:
-            return Table(name=new_tname if new_tname else
+            return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp), data=self.table)
 
         header = self.header
         if kwargs.get('use_shortnames', self.use_shortnames):
             header = self.make_shortnames()
+
+        cb = kwargs.get('convert_bool', self.convert_bool)
+        cn = kwargs.get('convert_numbers', self.convert_numbers)
+        un = kwargs.get('use_none', self.use_none)
 
         try:
             col = -1
@@ -897,11 +929,12 @@ class Table:
         except ValueError:
             return Table()
 
-        return Table(name=new_tname if new_tname else
+        return Table(name=name if name else
                      self.name + TNAME_TNAME_DELIMITER + str(self.timestamp),
                      data=[self.header] +
                         [[function(r[c]) if c == col or column == '*' else
-                            r[c] for c in range(self.cols)] for r in self.table])
+                            r[c] for c in range(self.cols)] for r in self.table],
+                     convert_bool=cb, convert_numbers=cn, use_none=un)
 
 # -- MAIN starts here ---------------------------------------------------------------------------- #
 if __name__ == "__main__":
