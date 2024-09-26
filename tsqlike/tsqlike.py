@@ -312,15 +312,27 @@ class Table:
         self.cols = self.rows and len(self.table[0]) or 0
 
     # -------------------------------------------------------------------------------------------- #
-    def make_shortnames(self, header=''):
+    def make_shortnames(self, header='', force=False):
 
-        """Remove Table name from column names in the Table header"""
+        """Return Header with no Dot-prefix of the columns"""
 
         if not header:
             header = self.header
 
+        if force:
+            return [h.split(TNAME_COLUMN_DELIMITER)[1] for h in header]
+
         return [h.split(TNAME_COLUMN_DELIMITER)[1]
                        if h.startswith(self.name + TNAME_COLUMN_DELIMITER) else h for h in header]
+
+    # -------------------------------------------------------------------------------------------- #
+    def set_shortnames(self, table=None, force=False):
+
+        """Remove Dot-prefix of the columns from self/Table header"""
+
+        table = table if isinstance(table, Table) else self
+        table.header = self.make_shortnames(table.header, force)
+        return table
 
     # -- Import methods -------------------------------------------------------------------------- #
     def import_list_dicts(self, data, name=None, **kwargs):

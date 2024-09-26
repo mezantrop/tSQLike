@@ -1,5 +1,10 @@
 # CHANGELOG
 
+* **2024.09.26    tSQLike-1.1.5.2**
+  * `force=False/True` argument of `make_shortnames()`/`set_shortnames()` to wipe Dot-prefix with force
+  * `set_shortnames()` - Remove Dot-prefix of the columns from self/Table header (changes Table object)
+  * `make_shortnames()` - Return Header with no Dot-prefix of the columns (does not change Table object)
+
 * **2024.09.25    tSQLike-1.1.5.1**
   * Children `Table` objects inherit `convert_bool`, `convert_numbers` and `use_none` from parent
   * `new_tname` methods argument renamed to `name`

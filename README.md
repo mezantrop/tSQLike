@@ -86,11 +86,12 @@ The main class of the module
 | `write_json_lt` | &#9745; | `eval()`-free version of `Table.write_json`                         |
 | `write_xml`     | &#9744; | Write `XML`. NB: Do we need this?                                   |
 
-#### Service methods
+#### Header manipulation methods
 
 | Name              | Status  | Description                                                         |
 |-------------------|---------|---------------------------------------------------------------------|
-| `make_shortnames` | &#9745; | Remove Table name from column names in the Table header             |
+| `make_shortnames` | &#9745; | Return Header with no Dot-prefix of the columns                     |
+| `set_shortnames`  | &#9745; | Remove Dot-prefix of the columns from self/Table header             |
 
 #### Private methods
 
@@ -128,6 +129,10 @@ and safety of these arguments and `EvalCtrl` helps to block potentially dangerou
 
 Alternatively you can use `Table.join_lt()`, `Table.select_lt()` and `Table.write_json()`. They are significantly less
 powerful, but do not use `eval()`.
+
+## TODO
+
+* Rework: Table Names, Header Column Names, Dot-Prefixes
 
 ## Contacts
 
