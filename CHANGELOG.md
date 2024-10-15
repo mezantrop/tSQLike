@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.10.15    tSQLike-1.1.6**
+  * Make `Table` object `iterable`, `iterate_header` boolean controlls whether header to be included or not
+
 * **2024.09.26    tSQLike-1.1.5.2**
   * `force=False/True` argument of `make_shortnames()`/`set_shortnames()` to wipe Dot-prefix with force
   * `set_shortnames()` - Remove Dot-prefix of the columns from self/Table header (changes Table object)

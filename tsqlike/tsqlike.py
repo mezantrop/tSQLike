@@ -269,6 +269,7 @@ class Table:
         # to allow select() using custom defined functions
         self.globals = kwargs.get('globals', {})
         self.use_shortnames = kwargs.get('use_shortnames', False)
+        self.iterate_header = kwargs.get('iterate_header', False)
 
         if not data:
             self.table = []
@@ -298,6 +299,16 @@ class Table:
         self.export_table = self.export_list_lists
         self.export_thashes = self.export_list_dicts
         self.export_htables = self.export_dict_lists
+
+    # -------------------------------------------------------------------------------------------- #
+    def __iter__(self):
+        if self.iterate_header:
+            yield self.header if not self.use_shortnames else self.make_shortnames()
+
+        r = 0
+        while  r < self.rows:
+            yield self.table[r]
+            r += 1
 
     # -------------------------------------------------------------------------------------------- #
     def __repr__(self):
