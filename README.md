@@ -7,7 +7,6 @@
 
 <a href="https://www.buymeacoffee.com/mezantrop" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-
 ## Description
 
 **tSQLike** is a `Python3` module that is written with a hope to make tabular data process easier using SQL-like primitives.
@@ -19,7 +18,7 @@
 ## Usage
 
 ```Python3
-from tsqlike import tsqlike
+import tsqlike
 
 t1 = tsqlike.Table(data=[['h1', 'h2', 'h3', 'h4'],
                         ['a', 'b', 'c', 'd'],

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+* **2024.10.15    Current**
+  * `Table.__repr__()` returns object representation to be unambiguous
+  * `Table.__str__()` returns string representation of data to be readable
+  * module import simplified: `from tsqlike import tsqlike` can be replaced by just `import tsqlike`
+
 * **2024.10.15    tSQLike-1.1.6**
   * Make `Table` object `iterable`, `iterate_header` boolean controls whether header to be included or not
 

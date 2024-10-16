@@ -312,7 +312,16 @@ class Table:
 
     # -------------------------------------------------------------------------------------------- #
     def __repr__(self):
-        return str(self.table)
+        me = self.__class__.__module__ + '.' + self.__class__.__qualname__
+        return str(f"{me}(data={self.export_list_lists()}, name='{self.name}', "
+            f"timestamp={self.timestamp}, convert_bool={self.convert_bool}, "
+            f"convert_numbers={self.convert_numbers}, use_none={self.use_none}, "
+            f"globals={self.globals}, use_shortnames={self.use_shortnames}, "
+            f"iterate_header={self.iterate_header})")
+
+    # -------------------------------------------------------------------------------------------- #
+    def __str__(self):
+        return str(self.export_list_lists())
 
     # -------------------------------------------------------------------------------------------- #
     def _redimension(self):
