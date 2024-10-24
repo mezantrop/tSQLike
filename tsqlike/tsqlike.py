@@ -658,11 +658,11 @@ class Table:
         if mode in (JOIN_LEFT, JOIN_FULL):
             for it in range(0, self.rows):
                 if it not in tl_match:
-                    r_table.append([self.table[it] + [None] * table.cols])
+                    r_table.extend([self.table[it] + [None] * table.cols])
         if mode in (JOIN_RIGHT, JOIN_FULL):
             for it in range(0, table.rows):
                 if it not in tr_match:
-                    r_table.append([[None] * self.cols + table.table[it]])
+                    r_table.extend([[None] * self.cols + table.table[it]])
 
         if replace:
             # Replace source - self - with the joined Table
