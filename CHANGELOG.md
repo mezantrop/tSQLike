@@ -1,6 +1,7 @@
 # CHANGELOG
 
-* **2024.10.15    Current**
+* **2024.10.24    tSQLike-1.1.7**
+  * `Table.join()` `extend` replaces `append` lists method
   * `Table.__repr__()` returns object representation to be unambiguous
   * `Table.__str__()` returns string representation of data to be readable
   * module import simplified: `from tsqlike import tsqlike` can be replaced by just `import tsqlike`
