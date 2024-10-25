@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.10.24    tSQLike-1.1.7.1**
+  * `Table.join()` Speed up `FULL_JOIN` operations
+
 * **2024.10.24    tSQLike-1.1.7**
   * `Table.join()` `extend` replaces `append` lists method
   * `Table.__repr__()` returns object representation to be unambiguous

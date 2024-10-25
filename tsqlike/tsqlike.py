@@ -648,18 +648,22 @@ class Table:
         # Concatenate table headers as row[0] of the results table
         r_table.append(self.header + table.header)
 
-        # Inner JOIN
         for c_tl, tl in enumerate(self.table):
             for c_tr, tr in enumerate(table.table):
-                if efunc(tl, tr):
-                    r_table.append(tl + tr)
-                    tl_match.append(c_tl)
-                    tr_match.append(c_tr)
-        if mode in (JOIN_LEFT, JOIN_FULL):
+                if mode == JOIN_FULL:
+                    r_table.extend([tl + tr])
+                else:
+                    # Inner JOIN
+                    if efunc(tl, tr):
+                        r_table.extend([tl + tr])
+                        tl_match.append(c_tl)
+                        tr_match.append(c_tr)
+
+        if mode == JOIN_LEFT:
             for it in range(0, self.rows):
                 if it not in tl_match:
                     r_table.extend([self.table[it] + [None] * table.cols])
-        if mode in (JOIN_RIGHT, JOIN_FULL):
+        if mode == JOIN_RIGHT:
             for it in range(0, table.rows):
                 if it not in tr_match:
                     r_table.extend([[None] * self.cols + table.table[it]])
