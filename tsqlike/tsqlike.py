@@ -379,6 +379,9 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
+            if kwargs.get('use_shortnames', self.use_shortnames):
+                self.set_shortnames()
+
             cb = kwargs.get('convert_bool', self.convert_bool)
             cn = kwargs.get('convert_numbers', self.convert_numbers)
             un = kwargs.get('use_none', self.use_none)
@@ -406,6 +409,9 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(h)
                            if TNAME_COLUMN_DELIMITER not in str(h) else str(h) for h in
                            list(data.keys())]
+
+            if kwargs.get('use_shortnames', self.use_shortnames):
+                self.set_shortnames()
 
             self.table = [[None for _ in range(len(data.keys()))]
                           for _ in range(len(data[next(iter(data))]))]
@@ -458,6 +464,9 @@ class Table:
             if header and data[0]:
                 self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                                if TNAME_COLUMN_DELIMITER not in str(f) else f for f in data[0]]
+
+                if kwargs.get('use_shortnames', self.use_shortnames):
+                    self.set_shortnames()
             else:
                 # Let's create a header, if there is no one
                 self.header = [str(h) for h in range(self.cols)]

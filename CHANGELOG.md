@@ -1,5 +1,8 @@
 # CHANGELOG
 
+* **2024.10.31    tSQLike-1.1.7.2**
+  * `Table.import_*()` to respect `use_shortnames` argument
+
 * **2024.10.24    tSQLike-1.1.7.1**
   * `Table.join()` Speed up `FULL_JOIN` operations
 
