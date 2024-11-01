@@ -331,6 +331,37 @@ class Table:
         self.rows = len(self.table)
         self.cols = self.rows and len(self.table[0]) or 0
 
+    # -- Header manipulation methods ------------------------------------------------------------- #
+    def get_column(self, column=None, **kwargs):
+
+        """Return a column name by index or return column ID by its name. None if not found"""
+
+        header = self.header
+        if kwargs.get('use_shortnames', self.use_shortnames):
+            header = self.make_shortnames()
+
+        if isinstance(column, str) and column in header:
+            return header.index(column)
+
+        if isinstance(column, int) and column >= 0 and column < len(header):
+            return header[column]
+
+        return None
+
+    # -------------------------------------------------------------------------------------------- #
+    def rename_column(self, oldname, newname, **kwargs):
+
+        """Rename a column name in the header"""
+
+        idx = self.get_column(oldname, **kwargs)
+        if idx is not None:
+            idx = idx if isinstance(idx, int) else oldname
+
+            self.header[idx] = (self.header[idx].split(TNAME_COLUMN_DELIMITER)[0] +
+                                TNAME_COLUMN_DELIMITER + newname)
+
+        return idx
+
     # -------------------------------------------------------------------------------------------- #
     def make_shortnames(self, header='', force=False):
 
@@ -379,9 +410,6 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                            if TNAME_COLUMN_DELIMITER not in str(f) else f for f in (data[0].keys())]
 
-            if kwargs.get('use_shortnames', self.use_shortnames):
-                self.set_shortnames()
-
             cb = kwargs.get('convert_bool', self.convert_bool)
             cn = kwargs.get('convert_numbers', self.convert_numbers)
             un = kwargs.get('use_none', self.use_none)
@@ -409,9 +437,6 @@ class Table:
             self.header = [self.name + TNAME_COLUMN_DELIMITER + str(h)
                            if TNAME_COLUMN_DELIMITER not in str(h) else str(h) for h in
                            list(data.keys())]
-
-            if kwargs.get('use_shortnames', self.use_shortnames):
-                self.set_shortnames()
 
             self.table = [[None for _ in range(len(data.keys()))]
                           for _ in range(len(data[next(iter(data))]))]
@@ -464,9 +489,6 @@ class Table:
             if header and data[0]:
                 self.header = [self.name + TNAME_COLUMN_DELIMITER + str(f)
                                if TNAME_COLUMN_DELIMITER not in str(f) else f for f in data[0]]
-
-                if kwargs.get('use_shortnames', self.use_shortnames):
-                    self.set_shortnames()
             else:
                 # Let's create a header, if there is no one
                 self.header = [str(h) for h in range(self.cols)]

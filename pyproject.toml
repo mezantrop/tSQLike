@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "tssplit==1.0.7",
+  "tssplit>=1.0.7",
 ]
 
 [project.urls]

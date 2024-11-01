@@ -1,5 +1,10 @@
 # CHANGELOG
 
+* **2024.11.01    tSQLike-1.1.8**
+  * `Table.get_column()` method returns either a column name by index or index by name. None if not found
+  * `Table.rename_column()` renames a column name
+  * `Table.import_*()` methods no more make short column names
+
 * **2024.10.31    tSQLike-1.1.7.2**
   * `Table.import_*()` to respect `use_shortnames` argument
 

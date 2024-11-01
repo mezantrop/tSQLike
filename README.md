@@ -87,10 +87,12 @@ The main class of the module
 
 #### Header manipulation methods
 
-| Name              | Status  | Description                                                         |
-|-------------------|---------|---------------------------------------------------------------------|
-| `make_shortnames` | &#9745; | Return Header with no Dot-prefix of the columns                     |
-| `set_shortnames`  | &#9745; | Remove Dot-prefix of the columns from self/Table header             |
+| Name              | Status  | Description                                                                |
+|-------------------|---------|----------------------------------------------------------------------------|
+| `get_column`      | &#9745; | Return either a column name by index or index by name. None if not found   |
+| `rename_column`   | &#9745; | Rename a column name in the header                                         |
+| `make_shortnames` | &#9745; | Return Header with no Dot-prefix of the columns                            |
+| `set_shortnames`  | &#9745; | Remove Dot-prefix of the columns from self/Table header                    |
 
 #### Private methods
 
