@@ -9,7 +9,7 @@
 
 ## Description
 
-**tSQLike** is a `Python3` module that is written with a hope to make tabular data process easier using SQL-like primitives.
+**tSQLike** is a `Python3` module that is written with a hope to make tabular data processing easier using SQL-like primitives.
 
 ## Notes
 
